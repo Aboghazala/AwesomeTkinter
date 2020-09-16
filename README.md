@@ -3,11 +3,6 @@ AwesomeTkinter offers some new and pretty tkinter widgets
 example widgets:  
 radial progressbar, scrollable frames, 3d buttons, 3d frames, and more.
 
-also, you can use a lot of useful functions that can manipulate images,
-e.g. to create tkinter PhotoImage from a file but want to change its
-size and color you can `img = atk.create_image(fp='path to my image
-file', color='red', size=100)`
-
 # Screenshots:
 ![progressbar](https://user-images.githubusercontent.com/37757246/93201974-382be080-f752-11ea-8bc1-183f9bcb6b58.png)
 --------------------------------------------------------------------------------------------------------------------
@@ -65,6 +60,13 @@ btn = atk.Button3d(f2, text='Pressed Button')
 btn.pack(pady=10)
 
 root.mainloop()
+```
+
+also, you can use a lot of useful functions that manipulate images, e.g.
+to create a tkinter PhotoImage from a file but want to change its size
+and color:
+```
+img = atk.create_image(fp='path to my image file', color='red', size=(150, 100))
 ```
 
 # Documentations:
