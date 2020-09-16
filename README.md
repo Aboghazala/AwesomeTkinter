@@ -58,8 +58,7 @@ bar = atk.RadialProgressbar(f2, fg='green')
 bar.pack(padx=30, pady=30)
 bar.start()
 
-btn = atk.Button3d(f2, text='Pressed Button')
-btn.pack(pady=10)
+atk.Button3d(f2, text='Pressed Button').pack(pady=10)
 
 root.mainloop()
 ```
