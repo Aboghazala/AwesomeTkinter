@@ -40,7 +40,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Aboghazala/AwesomeTkinter",
     packages=setuptools.find_packages(),
-    keywords="internet download manager youtube downloader pycurl curl youtube-dl PySimpleGUI",
+    keywords="tkinter gui python",
     project_urls={
         'Source': 'https://github.com/Aboghazala/AwesomeTkinter',
         'Tracker': 'https://github.com/Aboghazala/AwesomeTkinter/issues',
