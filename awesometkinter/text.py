@@ -8,6 +8,7 @@
 import tkinter as tk
 from tkinter import ttk
 from .utils import *
+from .scrollbar import SimpleScrollbar
 
 
 class ScrolledText(tk.Frame):
