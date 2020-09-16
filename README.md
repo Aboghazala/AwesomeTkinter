@@ -7,7 +7,9 @@ radial progressbar, scrollable frames, 3d buttons, 3d frames, and more.
 ![progressbar](https://user-images.githubusercontent.com/37757246/93201974-382be080-f752-11ea-8bc1-183f9bcb6b58.png)
 --------------------------------------------------------------------------------------------------------------------
 
-# Applications Made with AwesomeTkinter:
+# Applications use AwesomeTkinter:
+[PyIDM](https://github.com/pyIDM/PyIDM)
+
 ![PyIDM](https://user-images.githubusercontent.com/58998813/92564079-e4fcee00-f278-11ea-83e1-9a272bc06b0f.png)
 
 # Installation:
