@@ -18,6 +18,20 @@ file', color='red', size=100)`
 # Installation:
 `python3 pip install awesometkinter`
 
+for quick test:
+```
+import awesometkinter as atk
+atk.main()
+```
+
+or from terminal:
+```
+python3 -m awesometkinter
+or just
+awesometkinter
+```
+this will display a test window
+
 # Requirements:
 - minimum python version 3.6
 - tkinter
