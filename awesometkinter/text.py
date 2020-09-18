@@ -72,13 +72,12 @@ class ScrolledText(tk.Frame):
         if self.vscroll:
             self.vbar = SimpleScrollbar(self, orient='vertical', command=self.text.yview, slider_color=self.sbar_fg, bg=self.sbar_bg)
             self.vbar.grid(row=0, column=1, sticky='ns')
+            self.text.config(yscrollcommand=self.vbar.set)
 
         if self.hscroll:
             self.hbar = SimpleScrollbar(self, orient='horizontal', command=self.text.xview, slider_color=self.sbar_fg, bg=self.sbar_bg)
             self.hbar.grid(row=1, column=0, sticky='ew')
-
-        self.text.config(yscrollcommand=self.vbar.set)
-        self.text.config(xscrollcommand=self.hbar.set)
+            self.text.config(xscrollcommand=self.hbar.set)
 
         # bind mouse wheel to scroll
         scroll_with_mousewheel(self.text)
@@ -99,7 +98,7 @@ class ScrolledText(tk.Frame):
                 delta = count - self.max_chars
                 text = text[delta:]
 
-        self.text.insert(0, text)
+        self.text.insert("1.0", text)
 
         self.scrolltobottom()
 
@@ -140,6 +139,6 @@ class ScrolledText(tk.Frame):
         """scroll to bottom if autoscroll enabled and scrollbar position at the bottom"""
         try:
             if self.autoscroll and self.vbar.get()[1] == 1:
-                self.text.yview_moveto(1.0)
+                self.text.yview_moveto("1.0")
         except:
             pass 
