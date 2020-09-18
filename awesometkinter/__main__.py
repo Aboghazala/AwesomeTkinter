@@ -19,6 +19,9 @@ if __package__ is None and not hasattr(sys, 'frozen'):
 
     __package__ = 'awesometkinter'
 
+    # load awesometkinter
+    import awesometkinter
+
 from .__init__ import main
 
 
