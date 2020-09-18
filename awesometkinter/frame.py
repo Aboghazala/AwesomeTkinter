@@ -148,7 +148,7 @@ class Frame3d(ttk.Frame):
         ttk.Frame.__init__(self, parent, **options)
 
         # create unique style name based on frame color
-        frame_style = generate_unique_name('Frame3d_', color_to_rgba(self.bg))
+        frame_style = f'Frame3d_{generate_unique_name(color_to_rgba(self.bg))}'
 
         # create style
         if frame_style not in Frame3d.styles:
