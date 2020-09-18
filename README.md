@@ -34,13 +34,25 @@ this will display a test window
 - tkinter
 - pillow
 
+# Limitations:
+- tkinter theme should be 'default', 'alt', or 'classic' for things to
+  work fine on windows, so after creating your root you should change
+  theme like example below
+
+
 # Example:
 ```
 import tkinter as tk
+from tkinter import ttk
 import awesometkinter as atk
 
 root = tk.Tk()
 root.config(background=DEFAULT_COLOR)
+
+# select tkinter theme required for things to be right on windows,
+# only 'alt', 'default', or 'classic' can work fine on windows 10
+s = ttk.Style()
+s.theme_use('default')
 
 f1 = atk.Frame3d(root)
 f1.pack(side='left', expand=True, fill='both', padx=3, pady=3)
