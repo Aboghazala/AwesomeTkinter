@@ -4,7 +4,7 @@ example widgets:
 radial progressbar, scrollable frames, 3d buttons, 3d frames, and more.
 
 # Screenshots:
-![progressbar](https://user-images.githubusercontent.com/37757246/93201974-382be080-f752-11ea-8bc1-183f9bcb6b58.png)
+![progressbar](https://user-images.githubusercontent.com/37757246/93717162-3c059b80-fb74-11ea-9998-00fc5ba82ca3.png)
 --------------------------------------------------------------------------------------------------------------------
 
 # Applications use AwesomeTkinter:

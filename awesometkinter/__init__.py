@@ -21,6 +21,7 @@ from .config import *
 def main():
     
     root = tk.Tk()
+    root.title('AwesomeTkinter')
     root.config(background=DEFAULT_COLOR)
 
     # select tkinter theme required for things to be right on windows,
@@ -31,7 +32,7 @@ def main():
     f1 = Frame3d(root)
     f1.pack(side='left', expand=True, fill='both', padx=3, pady=3)
 
-    bar = RadialProgressbar3d(f1, fg='cyan', size=120)
+    bar = RadialProgressbar3d(f1, fg='cyan', size=120, font_size_ratio=0.08)
     bar.pack(padx=20, pady=20)
     bar.start()
 
