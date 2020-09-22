@@ -290,9 +290,11 @@ def create_circle(size=100, thickness=None, color='black', antialias=4, offset=0
     """
 
     if isinstance(size, int):
-        requested_size = (size, size)
+        size = (size, size)
     else:
-        requested_size = size
+        size = size
+
+    requested_size = size
 
     # calculate thickness to be 2% of circle diameter
     thickness = thickness or max(size[0] * 2 // 100, 2)
