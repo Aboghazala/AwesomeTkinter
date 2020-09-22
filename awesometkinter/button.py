@@ -91,7 +91,7 @@ class Radiobutton(ttk.Radiobutton):
         ind_outline_color = ind_outline_color or fg
         ind_mark_color = ind_mark_color or fg
 
-        value = value or text
+        value = value if value is not None else text
 
         custom_style = f'RadioButton_{len(Radiobutton.styles)}'
         Radiobutton.styles.append(custom_style)
