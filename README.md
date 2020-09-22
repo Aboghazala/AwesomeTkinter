@@ -5,6 +5,9 @@ radial progressbar, scrollable frames, 3d buttons, 3d frames, and more.
 
 # Screenshots:
 ![progressbar](https://user-images.githubusercontent.com/37757246/93717162-3c059b80-fb74-11ea-9998-00fc5ba82ca3.png)
+
+[More Screenshots](https://github.com/Aboghazala/AwesomeTkinter/issues/1)
+
 --------------------------------------------------------------------------------------------------------------------
 
 # Applications use AwesomeTkinter:
@@ -13,7 +16,8 @@ radial progressbar, scrollable frames, 3d buttons, 3d frames, and more.
 ![PyIDM](https://user-images.githubusercontent.com/58998813/92564079-e4fcee00-f278-11ea-83e1-9a272bc06b0f.png)
 
 # Installation:
-`python3 pip install awesometkinter`
+`python pip install awesometkinter` on windows  
+`python3 pip install awesometkinter` on linux
 
 for quick test:
 ```
@@ -46,6 +50,7 @@ import tkinter as tk
 from tkinter import ttk
 import awesometkinter as atk
 
+# our root
 root = tk.Tk()
 root.config(background=DEFAULT_COLOR)
 
@@ -54,18 +59,22 @@ root.config(background=DEFAULT_COLOR)
 s = ttk.Style()
 s.theme_use('default')
 
+# 3d frame
 f1 = atk.Frame3d(root)
 f1.pack(side='left', expand=True, fill='both', padx=3, pady=3)
 
+# 3d progressbar
 bar = atk.RadialProgressbar3d(f1, fg='cyan', size=120)
 bar.pack(padx=20, pady=20)
 bar.start()
 
+# 3d button
 atk.Button3d(f1, text='3D Button').pack(pady=10)
 
 f2 = atk.Frame3d(root)
 f2.pack(side='left', expand=True, fill='both', padx=3, pady=3)
 
+# flat radial progressbar
 bar = atk.RadialProgressbar(f2, fg='green')
 bar.pack(padx=30, pady=30)
 bar.start()
