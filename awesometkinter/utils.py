@@ -121,7 +121,14 @@ def resize_img(img, size, keep_aspect_ratio=True):
 
 
 def mix_images(background_img, foreground_img):
-    """paste an image on top of another image"""
+    """paste an image on top of another image
+    Args:
+        background_img: pillow image in background
+        foreground_img: pillow image in foreground
+
+    Returns:
+        pillow image
+    """
     background_img = background_img.convert('RGBA')
     foreground_img = foreground_img.convert('RGBA')
 
@@ -272,7 +279,7 @@ def create_image(fp=None, img=None, color=None, size=None, b64=None):
     return img
 
 
-def create_circle(size=100, thickness=None, color='black', antialias=4, offset=0):
+def create_circle(size=100, thickness=None, color='black', fill=None, antialias=4, offset=0):
     """create high quality circle
 
     the idea to smooth circle line is to draw a bigger size circle and then resize it to the requested size
@@ -282,6 +289,7 @@ def create_circle(size=100, thickness=None, color='black', antialias=4, offset=0
         size (tuple or list, or int): outer diameter of the circle or width of bounding box
         thickness (int): outer line thickness in pixels
         color (str): outer line color
+        fill (str): fill color, default is a transparent fill
         antialias (int): used to enhance outer line quality and make it smoother
         offset (int): correct cut edges of circle outline
 
@@ -293,6 +301,8 @@ def create_circle(size=100, thickness=None, color='black', antialias=4, offset=0
         size = (size, size)
     else:
         size = size
+
+    fill_color = color_to_rgba(fill) or '#0000'
 
     requested_size = size
 
@@ -311,8 +321,7 @@ def create_circle(size=100, thickness=None, color='black', antialias=4, offset=0
     draw = ImageDraw.Draw(img)
 
     # draw circle with a required color
-    draw.ellipse([offset, offset, size[0] - offset, size[1] - offset], outline=color, fill='#0000', width=thickness)
-    # draw.ellipse((0, 0, size[0], size[1]), outline=color, fill='#0000', width=thickness)
+    draw.ellipse([offset, offset, size[0] - offset, size[1] - offset], outline=color, fill=fill_color, width=thickness)
 
     img = img.filter(ImageFilter.BLUR)
 
@@ -320,7 +329,11 @@ def create_circle(size=100, thickness=None, color='black', antialias=4, offset=0
     img = img.resize(requested_size, Image.LANCZOS)
 
     # change color again will enhance quality (weird)
-    img = change_img_color(img, color)
+    if fill:
+        img = change_img_color(img, color, old_color=color)
+        img = change_img_color(img, fill, old_color=fill)
+    else:
+        img = change_img_color(img, color)
 
     return img
 
