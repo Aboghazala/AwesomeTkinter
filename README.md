@@ -1,7 +1,17 @@
-AwesomeTkinter offers some new and pretty tkinter widgets
+AwesomeTkinter offers some pretty tkinter widgets  
+These widgets are just a pure tkinter widgets with custom styles.
 
-example widgets:  
-radial progressbar, scrollable frames, 3d buttons, 3d frames, and more.
+current available widgets:
+- radial progressbar (flat or 3d).
+- scrollable frames,
+- 3d buttons,
+- 3d frames.
+- Scrollable text widget
+- radiobutton with better indicator/check mark quality.
+- simple scrollbar "without arrow heads"
+
+new widgets are coming soon
+
 
 # Screenshots:
 ![progressbar](https://user-images.githubusercontent.com/37757246/93717162-3c059b80-fb74-11ea-9998-00fc5ba82ca3.png)
@@ -11,8 +21,8 @@ radial progressbar, scrollable frames, 3d buttons, 3d frames, and more.
 --------------------------------------------------------------------------------------------------------------------
 
 
-# Applications use AwesomeTkinter:
-[PyIDM](https://github.com/pyIDM/PyIDM)
+# Applications examples that uses AwesomeTkinter:
+- [PyIDM](https://github.com/pyIDM/PyIDM)
 
 ![PyIDM](https://user-images.githubusercontent.com/58998813/92564079-e4fcee00-f278-11ea-83e1-9a272bc06b0f.png)
 
