@@ -63,7 +63,7 @@ import awesometkinter as atk
 
 # our root
 root = tk.Tk()
-root.config(background=DEFAULT_COLOR)
+root.config(background=atk.DEFAULT_COLOR)
 
 # select tkinter theme required for things to be right on windows,
 # only 'alt', 'default', or 'classic' can work fine on windows 10
