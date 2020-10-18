@@ -8,7 +8,7 @@
 
 import tkinter as tk
 
-from .button import Button3d
+from .button import *
 from .frame import Frame3d, ScrollableFrame
 from .menu import RightClickMenu
 from .progressbar import RadialProgressbar, RadialProgressbar3d
