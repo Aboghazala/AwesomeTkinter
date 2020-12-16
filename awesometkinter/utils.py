@@ -1,5 +1,7 @@
 import base64
+import math
 import platform
+import tkinter as tk
 from tkinter import ttk
 import PIL
 from PIL import Image, ImageTk, ImageColor, ImageDraw, ImageFilter
@@ -338,6 +340,81 @@ def create_circle(size=100, thickness=None, color='black', fill=None, antialias=
     return img
 
 
+def apply_gradient(img, gradient='vertical', colors=None, keep_transparency=True):
+    """apply gradient color for pillow image
+
+    Args:
+        img: pillow image
+        gradient (str): vertical, horizontal, diagonal, radial
+        colors (iterable): 2-colors for the gradient
+        keep_transparency (bool): keep original transparency
+    """
+
+    size = img.size
+    colors = colors or ['black', 'white']
+    color1 = color_to_rgba(colors[0])
+    color2 = color_to_rgba(colors[1])
+
+    # load pixels data
+    pixdata = img.load()
+
+    if gradient in ('horizontal', 'vertical', 'diagonal'):
+
+        for x in range(0, size[0]):
+            for y in range(0, size[1]):
+
+                if gradient == 'horizontal':
+                    ratio1 = x / size[1]
+                elif gradient == 'vertical':
+                    ratio1 = y / size[1]
+                elif gradient == 'diagonal':
+                    ratio1 = (y + x) / size[1]
+
+                ratio2 = 1 - ratio1
+
+                r = ratio1 * color2[0] + ratio2 * color1[0]
+                g = ratio1 * color2[1] + ratio2 * color1[1]
+                b = ratio1 * color2[2] + ratio2 * color1[2]
+
+                if keep_transparency:
+                    a = pixdata[x, y][-1]
+                else:
+                    a = ratio1 * color2[3] + ratio2 * color1[3]
+
+                r, g, b, a = (int(x) for x in (r, g, b, a))
+
+                # Place the pixel
+                img.putpixel((x, y), (r, g, b, a))
+
+    elif gradient == 'radial':  # inspired by https://stackoverflow.com/a/30669765
+        d = min(size)
+        radius = d // 2
+
+        for x in range(0, size[0]):
+            for y in range(0, size[1]):
+
+                # Find the distance to the center
+                distance_to_center = math.sqrt((x - size[0] / 2) ** 2 + (y - size[1] / 2) ** 2)
+
+                ratio1 = distance_to_center / radius
+                ratio2 = 1 - ratio1
+
+                r = ratio1 * color2[0] + ratio2 * color1[0]
+                g = ratio1 * color2[1] + ratio2 * color1[1]
+                b = ratio1 * color2[2] + ratio2 * color1[2]
+
+                if keep_transparency:
+                    a = pixdata[x, y][-1]
+                else:
+                    a = ratio1 * color2[3] + ratio2 * color1[3]
+                r, g, b, a = (int(x) for x in (r, g, b, a))
+
+                # Place the pixel
+                img.putpixel((x, y), (r, g, b, a))
+
+    return img
+
+
 def scroll_with_mousewheel(widget, target=None, modifier='Shift', apply_to_children=False):
     """scroll a widget with mouse wheel
 
@@ -453,8 +530,7 @@ def get_widget_attribute(widget, attr):
     return None
 
 
-all = ['identify_operating_system', 'calc_md5', 'generate_unique_name', 'invert_color', 'rgb2hex', 'change_img_color',
-       'resize_img', 'mix_images', 'color_to_rgba', 'is_dark', 'calc_font_color', 'calc_contrast_color',
-       'text_to_image', 'create_pil_image', 'create_image', 'create_circle', 'scroll_with_mousewheel',
-       'unbind_mousewheel', 'get_widget_attribute']
-
+__all__ = ['identify_operating_system', 'calc_md5', 'generate_unique_name', 'invert_color', 'rgb2hex',
+           'change_img_color', 'resize_img', 'mix_images', 'color_to_rgba', 'is_dark', 'calc_font_color',
+           'calc_contrast_color', 'text_to_image', 'create_pil_image', 'create_image', 'create_circle',
+           'scroll_with_mousewheel', 'unbind_mousewheel', 'get_widget_attribute', 'ImageTk']

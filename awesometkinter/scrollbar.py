@@ -4,7 +4,8 @@
     :copyright: (c) 2020 by Mahmoud Elshahat.
 
 """
-
+import tkinter as tk
+from tkinter import ttk
 from .utils import *
 
 

@@ -6,6 +6,7 @@
 """
 
 import tkinter as tk
+from tkinter import ttk
 from .utils import *
 from .config import *
 from .images import *

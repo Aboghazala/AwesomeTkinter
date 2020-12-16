@@ -5,6 +5,8 @@
 
 """
 
+import tkinter as tk
+from tkinter import ttk
 from .utils import *
 from .config import *
 from .images import *
@@ -125,5 +127,52 @@ class Radiobutton(ttk.Radiobutton):
                                  compound='left', **kwargs)
 
 
-all = ['Button3d', 'RadioButton']
+class Checkbutton(tk.Checkbutton):
+    """ tk.checkbutton with images """
 
+    def __init__(self, parent, box_color=None, check_mark_color=None, text_color=None, size=None, **kwargs):
+        """initialize
+        Args:
+            parent: tkinter container
+            box_color (str): checkbox color
+            check_mark_color (str): check mark color
+        """
+        bg = kwargs.get('bg') or get_widget_attribute(parent, 'background')
+        check_mark_color = check_mark_color or calc_font_color(bg)
+        box_color = box_color or calc_font_color(bg)
+        text_color = text_color or calc_font_color(bg)
+
+        # images
+        self.empty_box_img = create_image(b64=unchecked_icon, color=box_color, size=size)
+        self.checked_box_img = create_image(b64=checked_icon, color=check_mark_color, size=size)
+
+        # set default options
+        options = dict(
+            bg=bg,
+            activebackground=bg,
+            highlightbackground=bg,
+
+            fg=text_color,
+            activeforeground=text_color,
+            selectcolor=bg,
+
+            compound='left',
+
+            indicatoron=False,  # disable original indicator
+            image=self.empty_box_img,
+            selectimage=self.checked_box_img
+        )
+
+        # add space before text
+        text = kwargs.get('text')
+        if text:
+            kwargs['text'] = ' ' + text
+
+        # override default options
+        options.update(**kwargs)
+
+        # initialize super class
+        tk.Checkbutton.__init__(self, master=parent, **options)
+
+
+__all__ = ['Button3d', 'Radiobutton', 'Checkbutton']
