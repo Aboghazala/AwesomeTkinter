@@ -7,6 +7,7 @@
 """
 
 import tkinter as tk
+from tkinter import ttk
 
 from .button import Button3d, Radiobutton, Checkbutton
 from .frame import Frame3d, ScrollableFrame
@@ -16,12 +17,13 @@ from .scrollbar import SimpleScrollbar
 from .text import ScrolledText
 from .utils import *
 from .config import *
+from .version import __version__
 
 
 def main():
     
     root = tk.Tk()
-    root.title('AwesomeTkinter')
+    root.title('AwesomeTkinter ' + __version__)
     root.config(background=DEFAULT_COLOR)
 
     # select tkinter theme required for things to be right on windows,
