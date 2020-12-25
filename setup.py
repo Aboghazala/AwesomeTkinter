@@ -27,7 +27,7 @@ try:
     with open(f"{current_directory}/requirements.txt", "r") as fh:
         requirements = fh.readlines()
 except:
-    requirements = ['pillow']
+    requirements = ['pillow >= 8.0.0']
 
 setuptools.setup(
     name="AwesomeTkinter",
