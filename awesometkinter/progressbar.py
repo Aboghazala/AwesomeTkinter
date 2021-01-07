@@ -148,11 +148,9 @@ class RadialProgressbar(tk.Frame):
 
         # create style layout
         s.layout(bar_style,
-                 [('trough', {'sticky': 'nswe', 'children':
-                     [(base_element, {'children':
-                                            [('pbar', {'side': 'left', 'sticky': 'nsew', 'children':
-                                                [(indicator_element, {'sticky': 'nswe'})]
-                                                       })]})]})])
+                 [(base_element, {'children':
+                        [('pbar', {'side': 'left', 'sticky': 'nsew', 'children':
+                                [(indicator_element, {'sticky': 'nswe'})]})]})])
 
         # configure new style
         s.configure(bar_style, pbarrelief='flat', borderwidth=0, troughrelief='flat')

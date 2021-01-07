@@ -39,13 +39,14 @@ class Button3d(ttk.Button):
 
             # create elements
             s = ttk.Style()
-            element_name = f'{button_style}_element'
+            element_name = f'Button.focus.{button_style}_element'
             s.element_create(element_name, 'image', self.img, ('pressed', self.pressed_img), border=12, sticky="nsew")
+
             s.layout(button_style,
-                     [('Button.border', {'sticky': 'nswe', 'border': '1', 'children':
-                         [(element_name, {'sticky': 'nswe', 'children':
-                             [('Button.padding', {'sticky': 'nswe', 'children':
-                                 [('Button.label', {'sticky': 'nswe'})]})]})]})])
+                     [(element_name, {'sticky': 'nswe', 'children':
+                         [('Button.padding', {'sticky': 'nswe', 'children':
+                             [('Button.label', {'sticky': 'nswe'})]})]})])
+
             s.map(button_style, background=[('', parent_color)], foreground=[('', calc_font_color(self.bg))])
             s.configure(button_style, padding=0, borderwidth=0, focuscolor=self.bg)
 
