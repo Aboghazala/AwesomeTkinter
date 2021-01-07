@@ -1,5 +1,5 @@
 AwesomeTkinter offers some pretty tkinter widgets  
-These widgets are just a pure tkinter widgets with custom styles.
+These widgets are just a tkinter widgets with custom styles and images.
 
 current available widgets:
 - radial progressbar (flat or 3d).
@@ -47,11 +47,12 @@ this will display a test window
 # Requirements:
 - minimum python version 3.6
 - tkinter
-- pillow
+- pillow >= 6.0.0
 
 # Limitations:
-- tkinter theme should be 'default', 'alt', or 'classic' for things to
-  work fine on windows, so after creating your root you should change
+- some widgets don't work well with all tkinter themes, it is recommended to 
+  set tkinter theme to 'default', 'alt', or 'classic' for things to
+  work fine, so after creating your root you should change
   theme like example below
 
 
@@ -65,8 +66,8 @@ import awesometkinter as atk
 root = tk.Tk()
 root.config(background=atk.DEFAULT_COLOR)
 
-# select tkinter theme required for things to be right on windows,
-# only 'alt', 'default', or 'classic' can work fine on windows 10
+# it is recommended to select tkinter theme required for things to be right on windows,
+# 'alt', 'default', or 'classic' work fine on windows
 s = ttk.Style()
 s.theme_use('default')
 
