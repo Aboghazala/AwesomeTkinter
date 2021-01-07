@@ -530,7 +530,33 @@ def get_widget_attribute(widget, attr):
     return None
 
 
+def set_default_theme():
+    # select tkinter theme required for things to be right on windows,
+    # only 'alt', 'default', or 'classic' can work fine on windows 10
+    s = ttk.Style()
+    s.theme_use('default')
+
+
+def theme_compatibility_check(print_warning=False):
+    """check if current theme is compatible
+    Return:
+        bool: True or False
+    """
+    compatible_themes = ['alt', 'default', 'classic']
+    s = ttk.Style()
+    current_theme = s.theme_use()
+    if current_theme not in compatible_themes:
+        if print_warning:
+            print(f'AwesomeTkinter Warning: Widgets might not work properly under current theme ({current_theme})\n'
+                  f"compatible_themes are ['alt', 'default', 'classic']\n"
+                  f"you can set default theme using atk.set_default_theme() or style.theme_use('default')")
+        return False
+
+    return True
+
+
 __all__ = ['identify_operating_system', 'calc_md5', 'generate_unique_name', 'invert_color', 'rgb2hex',
            'change_img_color', 'resize_img', 'mix_images', 'color_to_rgba', 'is_dark', 'calc_font_color',
            'calc_contrast_color', 'text_to_image', 'create_pil_image', 'create_image', 'create_circle',
-           'scroll_with_mousewheel', 'unbind_mousewheel', 'get_widget_attribute', 'ImageTk']
+           'scroll_with_mousewheel', 'unbind_mousewheel', 'get_widget_attribute', 'ImageTk', 'set_default_theme',
+           'theme_compatibility_check']
