@@ -1,7 +1,7 @@
 """
     AwesomeTkinter, a new tkinter widgets design using custom styles and images
 
-    :copyright: (c) 2020 by Mahmoud Elshahat.
+    :copyright: (c) 2020-2021 by Mahmoud Elshahat.
 
 """
 
@@ -24,8 +24,9 @@ class RadialProgressbar(tk.Frame):
 
     # class variables to be shared between objects
     styles = []  # hold all style names created for all objects
+    imgs = {}  # imgs{"size":{"color": img}}  example: imgs{"100":{"red": img}}
 
-    def __init__(self, parent, size=100, bg=None, fg=None, text_fg=None, text_bg=None, font=None, font_size_ratio=None,
+    def __init__(self, parent, size=100, bg=None, fg='cyan', text_fg=None, text_bg=None, font=None, font_size_ratio=0.1,
                  base_img=None, indicator_img=None, parent_bg=None, **extra):
         """initialize progressbar
 
@@ -41,18 +42,18 @@ class RadialProgressbar(tk.Frame):
             base_img (tk.PhotoImage): base image for progressbar
             indicator_img (tk.PhotoImage): indicator image for progressbar
             parent_bg (str): color of parent container
-            extra: any extra kwargs (not used)
+            extra: any extra kwargs
 
         """
 
         self.parent = parent
         self.parent_bg = parent_bg or get_widget_attribute(self.parent, 'background')
         self.bg = bg or calc_contrast_color(self.parent_bg, 30)
-        self.fg = fg or 'cyan'
+        self.fg = fg
         self.text_fg = text_fg or calc_font_color(self.parent_bg)
         self.text_bg = text_bg or self.parent_bg
         self.size = size if isinstance(size, (list, tuple)) else (size, size)
-        self.font_size_ratio = font_size_ratio or 0.1
+        self.font_size_ratio = font_size_ratio
         self.font = font or f'any {int((sum(self.size) // 2) * self.font_size_ratio)}'
 
         self.base_img = base_img
@@ -79,7 +80,7 @@ class RadialProgressbar(tk.Frame):
         self.var.trace_add('write', self.show_percentage)
 
         # set default attributes
-        self.config()
+        self.config(**extra)
 
         self.start = self.bar.start
         self.stop = self.bar.stop
@@ -124,13 +125,19 @@ class RadialProgressbar(tk.Frame):
         # create style object
         s = ttk.Style()
 
+        RadialProgressbar.imgs.setdefault(self.size, {})
+        self.indicator_img = self.indicator_img or RadialProgressbar.imgs[self.size].get(self.fg)
+        self.base_img = self.base_img or RadialProgressbar.imgs[self.size].get(self.bg)
+
         if not self.indicator_img:
             img = create_circle(self.size, color=self.fg)
             self.indicator_img = ImageTk.PhotoImage(img)
+            RadialProgressbar.imgs[self.size].update(**{self.fg: self.indicator_img})
 
         if not self.base_img:
             img = create_circle(self.size, color=self.bg)
             self.base_img = ImageTk.PhotoImage(img)
+            RadialProgressbar.imgs[self.size].update(**{self.bg: self.base_img})
 
         # create elements
         indicator_element = f'top_img_{bar_style}'
@@ -187,49 +194,53 @@ class RadialProgressbar3d(RadialProgressbar):
         basically this is a ttk horizontal progressbar modified by using custom style layout and images
 
         Example:
-            bar = Radial3dProgressbar(frame1, size=150, fg='blue')
-            bar.grid(padx=10, pady=10)
+            bar = Radial3dProgressbar(root, size=150, fg='blue')
+            bar.pack(padx=10, pady=10)
             bar.start()
         """
+    imgs = {}  # imgs{"size":{"color": img}}  example: imgs{"100":{"red": img}}
 
-    def __init__(self, parent, size=100, fg=None, font=None, font_size_ratio=None, base_img=None, indicator_img=None, **extra):
+    def __init__(self, parent, size=100, fg='cyan', text_bg = '#333', text_fg = 'white', **extra):
         """initialize progressbar
 
         Args:
             parent  (tkinter object): tkinter container, i.e. toplevel window or frame
             size (int or 2-tuple(int, int)) size of progressbar
             fg(str): color of indicator ring
-            font (str): tkinter font for percentage text, e.g. 'any 20'
-            font_size_ratio (float): font size to progressbar width ratio, e.g. 0.1 equal font 10 for progressbar size 100
-            base_img_fp (str): base image path or file object
-            indicator_img_fp (str): indicator image path or file object
-
+            extra: any extra kwargs, e.g. font, font_size_ratio, etc... see parent class docs
         """
 
-        fg = fg or 'cyan'
-        text_bg = '#333'
-        text_fg = 'white'
+        RadialProgressbar3d.imgs.setdefault(size, {})
+        base_img = RadialProgressbar3d.imgs[size].get('base')
+        indicator_img = RadialProgressbar3d.imgs[size].get(fg)
 
-        # create pillow images
-        base_img = create_pil_image(b64=progressbar_3d_base)
-        indicator_img = create_circle(size=84, thickness=4, color=fg)
+        if not indicator_img:
+            # create pillow images
+            base_img = create_pil_image(b64=progressbar_3d_base)
+            indicator_img = create_circle(size=84, thickness=4, color=fg)
 
-        # change indicator color
-        indicator_img = change_img_color(indicator_img, fg)
+            # change indicator color
+            indicator_img = change_img_color(indicator_img, fg)
 
-        # merge indicator ring with base image copy
-        indicator_img = mix_images(base_img.copy(), indicator_img)
+            # merge indicator ring with base image copy
+            indicator_img = mix_images(base_img.copy(), indicator_img)
 
-        # resize
-        if self.size:
-            base_img = resize_img(base_img, size)
-            indicator_img = resize_img(indicator_img, size)
+            # resize
+            if self.size:
+                base_img = resize_img(base_img, size)
+                indicator_img = resize_img(indicator_img, size)
 
-        # create tkinter images using pillow ImageTk
-        indicator_img = ImageTk.PhotoImage(indicator_img)
-        base_img = ImageTk.PhotoImage(base_img)
+            # create tkinter images using pillow ImageTk
+            indicator_img = ImageTk.PhotoImage(indicator_img)
+            base_img = ImageTk.PhotoImage(base_img)
+
+            # store images for future use
+            RadialProgressbar3d.imgs[size].update(**{'base': base_img})
+            RadialProgressbar3d.imgs[size].update(**{fg: indicator_img})
 
         kwargs = locals().copy()
+        kwargs.update(**extra)
         kwargs.pop('self')
+        kwargs.pop('extra')
 
         RadialProgressbar.__init__(self, **kwargs) 
