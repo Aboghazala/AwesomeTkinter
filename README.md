@@ -22,9 +22,9 @@ new widgets are coming soon
 
 
 # Applications examples that uses AwesomeTkinter:
-- [PyIDM](https://github.com/pyIDM/PyIDM)
+- [FireDM](https://github.com/firedm/FireDM)
 
-![PyIDM](https://user-images.githubusercontent.com/58998813/92564079-e4fcee00-f278-11ea-83e1-9a272bc06b0f.png)
+![FireDM](https://user-images.githubusercontent.com/58998813/92564079-e4fcee00-f278-11ea-83e1-9a272bc06b0f.png)
 
 # Installation:
 `python pip install awesometkinter` on windows  
@@ -103,10 +103,10 @@ and color:
 img = atk.create_image(fp='path to my image file', color='red', size=(150, 100))
 ```
 
-# Documentations:
-TBA
+# Demos:
+https://github.com/Aboghazala/AwesomeTkinter/tree/master/demos
 
 ---
 # Author:
 Mahmoud Elshahat  
-2020
+2020-2021
