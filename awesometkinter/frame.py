@@ -1,7 +1,7 @@
 """
     AwesomeTkinter, a new tkinter widgets design using custom styles and images
 
-    :copyright: (c) 2020 by Mahmoud Elshahat.
+    :copyright: (c) 2020-2021 by Mahmoud Elshahat.
 
 """
 
@@ -39,7 +39,7 @@ class ScrollableFrame(tk.Frame):
             sbar_bg (str): color of scrollbars' trough, default to frame's background
         """
         self.autoscroll = autoscroll
-        self.last_height_value = None
+        self.current_height = None
 
         sbar_bg = sbar_bg or 'white'
         sbar_fg = sbar_fg or 'blue'
@@ -94,13 +94,14 @@ class ScrollableFrame(tk.Frame):
 
     def _on_self_configure(self, event):
         """Reset the scroll region to match contents"""
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-        self.update_idletasks()
+        if self.winfo_height() != self.current_height:
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-        # scroll to bottom
-        if self.autoscroll and self.last_height_value != self.winfo_height():
-            self.last_height_value = self.winfo_height()
-            self.scrolltobottom()
+            # scroll to bottom, if new widgets added to frame
+            if self.autoscroll:
+                self.scrolltobottom()
+
+            self.current_height = self.winfo_height()
 
     def _on_canvas_configure(self, event):
         """expand self to fill canvas"""
