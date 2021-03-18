@@ -1,7 +1,7 @@
 """
     AwesomeTkinter, a new tkinter widgets design using custom styles and images
 
-    :copyright: (c) 2020 by Mahmoud Elshahat.
+    :copyright: (c) 2020-2021 by Mahmoud Elshahat.
 
 """
 
@@ -73,6 +73,7 @@ class Radiobutton(ttk.Radiobutton):
     """ttk.Radiobutton with better indicator quality"""
 
     styles = []
+    imgs = {'outline_img': {}, 'selection_img': {}}
 
     def __init__(self, parent, text=None, ind_bg=None, ind_mark_color=None, ind_outline_color=None, bg=None, fg=None,
                  font=None, value=None, **kwargs):
@@ -101,17 +102,26 @@ class Radiobutton(ttk.Radiobutton):
 
         s = ttk.Style()
 
-        # create indicator outline
-        outline_img = create_circle(size=12, thickness=1, color=ind_outline_color, fill=ind_bg, offset=2)
-
-        # create indicator mark
-        mark_img = create_circle(size=6, thickness=0, color=ind_mark_color, fill=ind_mark_color)
-
-        selection_img = mix_images(outline_img, mark_img)
+        self.outline_img = Radiobutton.imgs['outline_img'].get('ind_outline_color')
+        self.selection_img = Radiobutton.imgs['selection_img'].get('ind_mark_color')
 
         # create tkinter PhotoImage
-        self.outline_img = create_image(img=outline_img)
-        self.selection_img = create_image(img=selection_img)
+        if not (self.outline_img and self.selection_img):
+            # create indicator outline
+            outline_img = create_circle(size=12, thickness=1, color=ind_outline_color, fill=ind_bg, offset=2)
+
+            # create indicator mark
+            mark_img = create_circle(size=6, thickness=0, color=ind_mark_color, fill=ind_mark_color)
+
+            selection_img = mix_images(outline_img, mark_img)
+
+            # create tkinter PhotoImage
+            self.outline_img = create_image(img=outline_img)
+            self.selection_img = create_image(img=selection_img)
+
+            # store them for future use
+            Radiobutton.imgs['outline_img']['ind_outline_color'] = self.outline_img
+            Radiobutton.imgs['selection_img']['ind_mark_color'] = self.selection_img
 
         # custom style
         s.layout(custom_style, [('Radiobutton.padding',
@@ -122,14 +132,25 @@ class Radiobutton(ttk.Radiobutton):
         if font:
             s.configure(custom_style, font=font)
 
+        # set default options
+        options = dict(
+            text=text,
+            value=value,
+            style=custom_style,
+            image=[self.outline_img, 'selected', self.selection_img],
+            compound='left'
+        )
+
+        # override default options
+        options.update(**kwargs)
+
         # initialize super class
-        ttk.Radiobutton.__init__(self, master=parent, text=text, value=value, style=custom_style,
-                                 image=[self.outline_img, 'selected', self.selection_img],
-                                 compound='left', **kwargs)
+        ttk.Radiobutton.__init__(self, master=parent, **options)
 
 
 class Checkbutton(tk.Checkbutton):
     """ tk.checkbutton with images """
+    imgs = {'empty_box_img': {}, 'checked_box_img': {}}
 
     def __init__(self, parent, box_color=None, check_mark_color=None, text_color=None, size=None, **kwargs):
         """initialize
@@ -144,8 +165,17 @@ class Checkbutton(tk.Checkbutton):
         text_color = text_color or calc_font_color(bg)
 
         # images
-        self.empty_box_img = create_image(b64=unchecked_icon, color=box_color, size=size)
-        self.checked_box_img = create_image(b64=checked_icon, color=check_mark_color, size=size)
+        self.empty_box_img = Checkbutton.imgs['empty_box_img'].get('box_color')
+        self.checked_box_img = Checkbutton.imgs['checked_box_img'].get('check_mark_color')
+
+        # create tkinter PhotoImage
+        if not (self.empty_box_img and self.checked_box_img):
+            self.empty_box_img = create_image(b64=unchecked_icon, color=box_color, size=size)
+            self.checked_box_img = create_image(b64=checked_icon, color=check_mark_color, size=size)
+
+            # store images for future use
+            Checkbutton.imgs['empty_box_img']['box_color'] = self.empty_box_img
+            Checkbutton.imgs['checked_box_img']['check_mark_color'] = self.checked_box_img
 
         # set default options
         options = dict(
