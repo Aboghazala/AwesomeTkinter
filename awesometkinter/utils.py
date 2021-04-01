@@ -530,6 +530,26 @@ def get_widget_attribute(widget, attr):
     return None
 
 
+def configure_widget(widget, **kwargs):
+    """configure widget's attributes"""
+    for k, v in kwargs.items():
+        # set widget attribute
+        try:
+            # treat as a "tk" widget, it will raise if widget is a "ttk"
+            widget.config(**{k: v})
+            continue
+        except:
+            pass
+
+        try:
+            # in case above failed, it might be a ttk widget
+            style_name = widget.cget('style') or widget.winfo_class()
+            s = ttk.Style()
+            s.configure(style_name, **{k: v})
+        except:
+            pass
+
+
 def set_default_theme():
     # select tkinter theme required for things to be right on windows,
     # only 'alt', 'default', or 'classic' can work fine on windows 10
@@ -559,4 +579,4 @@ __all__ = ['identify_operating_system', 'calc_md5', 'generate_unique_name', 'inv
            'change_img_color', 'resize_img', 'mix_images', 'color_to_rgba', 'is_dark', 'calc_font_color',
            'calc_contrast_color', 'text_to_image', 'create_pil_image', 'create_image', 'create_circle',
            'scroll_with_mousewheel', 'unbind_mousewheel', 'get_widget_attribute', 'ImageTk', 'set_default_theme',
-           'theme_compatibility_check']
+           'theme_compatibility_check', 'configure_widget']
