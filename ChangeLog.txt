@@ -1,3 +1,8 @@
+2021.4.1:
+- Add ability to change scrollbar width in scrollable frame and scrollable text, issue #7
+- right click menu, fix the problem of displaying menu on different widget instead of parent.
+- Added configur_widget function.
+
 2021.3.19:
 - [critical] fix checkbox and radiobutton images
 
