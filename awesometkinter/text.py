@@ -25,7 +25,7 @@ class ScrolledText(tk.Frame):
     """
 
     def __init__(self, parent, bg='white', fg='black', bd=0, wrap=None, vscroll=True, hscroll=True, autoscroll=True,
-                 max_chars=None, sbar_fg=None, sbar_bg=None, **kwargs):
+                 max_chars=None, sbar_fg=None, sbar_bg=None, vbar_width=10, hbar_width=10, **kwargs):
         """initialize
 
         Args:
@@ -41,6 +41,8 @@ class ScrolledText(tk.Frame):
                              match the max chars
             sbar_fg (str): color of scrollbars' slider
             sbar_bg (str): color of scrollbars' trough, default to frame's background
+            vbar_width (int): vertical scrollbar width
+            hbar_width (int): horizontal scrollbar width
 
         """
         tk.Frame.__init__(self, parent, bg=bg)
@@ -70,12 +72,14 @@ class ScrolledText(tk.Frame):
         self.text.grid(sticky='ewns')
 
         if self.vscroll:
-            self.vbar = SimpleScrollbar(self, orient='vertical', command=self.text.yview, slider_color=self.sbar_fg, bg=self.sbar_bg)
+            self.vbar = SimpleScrollbar(self, orient='vertical', command=self.text.yview, slider_color=self.sbar_fg,
+                                        bg=self.sbar_bg, width=vbar_width)
             self.vbar.grid(row=0, column=1, sticky='ns')
             self.text.config(yscrollcommand=self.vbar.set)
 
         if self.hscroll:
-            self.hbar = SimpleScrollbar(self, orient='horizontal', command=self.text.xview, slider_color=self.sbar_fg, bg=self.sbar_bg)
+            self.hbar = SimpleScrollbar(self, orient='horizontal', command=self.text.xview, slider_color=self.sbar_fg,
+                                        bg=self.sbar_bg, width=hbar_width)
             self.hbar.grid(row=1, column=0, sticky='ew')
             self.text.config(xscrollcommand=self.hbar.set)
 

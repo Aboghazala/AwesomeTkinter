@@ -26,7 +26,8 @@ class ScrollableFrame(tk.Frame):
         tk.Label(frame, text=hello).pack()
     """
 
-    def __init__(self, parent, vscroll=True, hscroll=True, autoscroll=False, bg=None, sbar_fg=None, sbar_bg=None):
+    def __init__(self, parent, vscroll=True, hscroll=True, autoscroll=False, bg=None, sbar_fg=None, sbar_bg=None,
+                 vbar_width=10, hbar_width=10):
         """initialize
 
         Args:
@@ -37,6 +38,8 @@ class ScrollableFrame(tk.Frame):
             bg (str): background
             sbar_fg (str): color of scrollbars' slider
             sbar_bg (str): color of scrollbars' trough, default to frame's background
+            vbar_width (int): vertical scrollbar width
+            hbar_width (int): horizontal scrollbar width
         """
         self.autoscroll = autoscroll
         self.current_height = None
@@ -55,12 +58,14 @@ class ScrollableFrame(tk.Frame):
 
         # scrollbars
         if vscroll:
-            self.vsb = SimpleScrollbar(self.outer_frame, orient="vertical", command=self.canvas.yview, bg=sbar_bg, slider_color=sbar_fg)
+            self.vsb = SimpleScrollbar(self.outer_frame, orient="vertical", command=self.canvas.yview, bg=sbar_bg,
+                                       slider_color=sbar_fg, width=vbar_width)
             self.canvas.configure(yscrollcommand=self.vsb.set)
 
             self.vsb.pack(side="right", fill="y")
         if hscroll:
-            self.hsb = SimpleScrollbar(self.outer_frame, orient="horizontal", command=self.canvas.xview, bg=sbar_bg, slider_color=sbar_fg)
+            self.hsb = SimpleScrollbar(self.outer_frame, orient="horizontal", command=self.canvas.xview, bg=sbar_bg,
+                                       slider_color=sbar_fg, width=hbar_width)
             self.canvas.configure(xscrollcommand=self.hsb.set)
 
             self.hsb.pack(side="bottom", fill="x")
