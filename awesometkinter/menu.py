@@ -1,7 +1,7 @@
 """
     AwesomeTkinter, a new tkinter widgets design using custom styles and images
 
-    :copyright: (c) 2020 by Mahmoud Elshahat.
+    :copyright: (c) 2020-2021 by Mahmoud Elshahat.
 
 """
 
@@ -17,14 +17,14 @@ class RightClickMenu(tk.Menu):
             menu_items (iterable): a list of entries / options to show in right click menu, to add a separator you can
                                    pass a string '---' as an item name
             callback (callable): any function or method that will be called when an option get selected,
-                                 should expect option name as an argument
+                                 should expect option name as a positional argument
             bg: background color
             fg: text color
             abg: background color on mouse hover
             afg: text color on mouse hover
 
         Example:
-            right_click_map = {'say hi': lambda: print('hiiii'),
+            right_click_map = {'say hi': lambda x: print(x),  # x = 'say hi'
                                'help': show_help,
                                'blah blah': blah_callback,
                                }
@@ -44,11 +44,20 @@ class RightClickMenu(tk.Menu):
             else:
                 self.add_command(label=f' {option}', command=lambda x=option: self.context_menu_handler(x))
 
-        parent.bind("<Button-3>", self.popup)
-        parent.bind("<Button-2>", self.popup)
+        parent.bind("<Button-3>", self.popup, add='+')
+        parent.bind("<Button-2>", self.popup, add='+')
+
+        self.parent = parent
 
     def popup(self, event):
-        self.tk_popup(event.x_root, event.y_root)
+        """show right click menu"""
+        # make sure popup menu will show only if mouse ontop of parent widget or its children
+        # to fix the problem of displaying menu on different widget than parent.
+        # this could be happen if right click on other widget while menu is shown
+        x, y = event.x_root, event.y_root
+        widget = self.winfo_containing(x, y)
+        if widget == self.parent or widget in self.parent.winfo_children():
+            self.tk_popup(x, y)
 
     def context_menu_handler(self, option):
         """handle selected option
@@ -59,6 +68,3 @@ class RightClickMenu(tk.Menu):
 
         if callable(self.callback):
             self.callback(option)
-
-        else:
-            print(f'{option}, selected, you should assign callback to handle selection') 
