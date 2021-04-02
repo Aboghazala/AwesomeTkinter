@@ -51,13 +51,8 @@ class RightClickMenu(tk.Menu):
 
     def popup(self, event):
         """show right click menu"""
-        # make sure popup menu will show only if mouse ontop of parent widget or its children
-        # to fix the problem of displaying menu on different widget than parent.
-        # this could be happen if right click on other widget while menu is shown
         x, y = event.x_root, event.y_root
-        widget = self.winfo_containing(x, y)
-        if widget == self.parent or widget in self.parent.winfo_children():
-            self.tk_popup(x, y)
+        self.tk_popup(x, y)
 
     def context_menu_handler(self, option):
         """handle selected option
