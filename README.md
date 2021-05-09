@@ -47,7 +47,7 @@ root.mainloop()
 # Applications examples that uses AwesomeTkinter:
 - [FireDM](https://github.com/firedm/FireDM)
 
-![FireDM](https://user-images.githubusercontent.com/58998813/92564079-e4fcee00-f278-11ea-83e1-9a272bc06b0f.png)
+![FireDM](https://user-images.githubusercontent.com/58998813/112715559-83852f80-8ee9-11eb-8ea3-d8c0f98a0153.png)
 
 # Installation:
 `python pip install awesometkinter` on windows  
