@@ -4,7 +4,7 @@
     :copyright: (c) 2020-2021 by Mahmoud Elshahat.
 
     module description:
-        handle arabic text to be shown properly in tkinter widgets
+        handle arabic text to be shown properly in tkinter widgets (on linux)
 
 """
 
@@ -233,6 +233,10 @@ def add_bidi_support(widget):
 
 if __name__ == '__main__':
     root = tk.Tk()
+    text = 'السلام عليكم'
+
+    # text display incorrectly on linux
+    tk.Label(root, text=text, font='any 20').pack()
 
     entry = tk.Entry(root, font='any 20', justify='right')
     entry.pack()
@@ -240,11 +244,12 @@ if __name__ == '__main__':
     lbl = tk.Label(root, font='any 20')
     lbl.pack()
 
+    # adding bidi support for widgets
     add_bidi_support(lbl)
-
     add_bidi_support(entry)
 
-    entry.set('السلام عليكم')
+    # we can use set() and get() methods to set and get text on a widget
+    entry.set(text)
     lbl.set('هذا كتاب adventure شيق')
 
     root.mainloop()

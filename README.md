@@ -16,12 +16,18 @@ current available widgets:
 
 new widgets are coming soon
 
-Added support to bidi language e.g. Arabic to be shown properly in tkinter widgets, see example below
+Added support to bidi language e.g. Arabic to be shown properly in tkinter widgets (on linux), see example below
+![progressbar](https://user-images.githubusercontent.com/37757246/117579022-63a07880-b0f1-11eb-8295-66942fec4025.png)
 
 ```
 import tkinter as tk
 import awesometkinter as atk
 root = tk.Tk()
+
+text = 'السلام عليكم'
+
+# text display incorrectly on linux without bidi support
+tk.Label(root, text=text, font='any 20').pack()
 
 entry = tk.Entry(root, font='any 20', justify='right')
 entry.pack()
@@ -34,7 +40,7 @@ atk.add_bidi_support(lbl)
 atk.add_bidi_support(entry)
 
 # we can use set() and get() methods to set and get text on a widget
-entry.set('السلام عليكم')
+entry.set(text)
 lbl.set('هذا كتاب adventure شيق')
 
 root.mainloop()
