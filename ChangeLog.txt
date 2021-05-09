@@ -1,3 +1,6 @@
+2021.5.9:
+- Added support to bidi language e.g. Arabic to be shown properly in tkinter widgets.
+
 2021.4.2:
 - revert for unnecessary fix in commit 063e6010 it turned out the problem happen when binding right click to right click menu itself
 
