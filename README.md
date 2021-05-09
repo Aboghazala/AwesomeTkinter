@@ -1,6 +1,10 @@
 AwesomeTkinter offers some pretty tkinter widgets  
 These widgets are just a tkinter widgets with custom styles and images.
 
+![progressbar](https://user-images.githubusercontent.com/37757246/93717162-3c059b80-fb74-11ea-9998-00fc5ba82ca3.png)
+
+[More Screenshots](https://github.com/Aboghazala/AwesomeTkinter/issues/1)
+
 current available widgets:
 - radial progressbar (flat or 3d).
 - scrollable frames,
@@ -36,11 +40,6 @@ lbl.set('هذا كتاب adventure شيق')
 root.mainloop()
 ```
 
-
-# Screenshots:
-![progressbar](https://user-images.githubusercontent.com/37757246/93717162-3c059b80-fb74-11ea-9998-00fc5ba82ca3.png)
-
-[More Screenshots](https://github.com/Aboghazala/AwesomeTkinter/issues/1)
 
 --------------------------------------------------------------------------------------------------------------------
 
