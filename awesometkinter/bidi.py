@@ -133,16 +133,15 @@ def isarabic(c):
     return False
 
 
-def move_cursor_to_left():
-    # control direction
-    current_index = entry.index(tk.INSERT)
-    new_index = current_index - 1 if current_index >= 1 else 0
-    entry.icursor(new_index)
-
-
 def handle_entry(event, widget):
     if widget.focus_get() != widget:
         return
+
+    def move_cursor_to_left():
+        # control direction
+        current_index = widget.index(tk.INSERT)
+        new_index = current_index - 1 if current_index >= 1 else 0
+        widget.icursor(new_index)
 
     text = widget._get()
 

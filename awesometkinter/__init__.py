@@ -18,6 +18,7 @@ from .text import ScrolledText
 from .utils import *
 from .config import *
 from .version import __version__
+from .bidi import *
 
 
 def main():
