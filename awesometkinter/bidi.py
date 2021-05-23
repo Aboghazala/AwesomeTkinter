@@ -159,10 +159,13 @@ def handle_entry(event, widget):
 
     # handle backspace
     if event.keysym in ('BackSpace', 'Delete'):
-        if widget.RTL and event.keysym == 'BackSpace' or not widget.RTL and event.keysym == 'Delete':
-            widget.delete(index)
-        elif index > 0:
-            widget.delete(index - 1)
+        try:
+            widget.delete("sel.first", "sel.last")
+        except:
+            if widget.RTL and event.keysym == 'BackSpace' or not widget.RTL and event.keysym == 'Delete':
+                widget.delete(index)
+            elif index > 0:
+                widget.delete(index - 1)
 
     elif widget.last_text == widget._get():
         return

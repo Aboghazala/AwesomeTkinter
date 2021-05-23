@@ -1,2 +1,1 @@
-pillow >= 8.0.0
-pyfribidi
+pillow >= 6.0.0
