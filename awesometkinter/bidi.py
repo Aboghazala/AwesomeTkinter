@@ -9,126 +9,252 @@
 """
 
 import tkinter as tk
-import pyfribidi
 import re
+from bidi.algorithm import get_display
+
+UNSHAPED = 0
+ISOLATED = 1
+INITIAL = 2
+MEDIAL = 3
+FINAL = 4
 
 
-def hex2int(hcode):
-    try:
-        return int(hcode, 16)
-    except:
-        return None
+shapes_table = (
+    ('\u0621', '\uFE80', '', '', ''),  # (ء, ﺀ, , , ), 
+    ('\u0622', '\uFE81', '', '', '\uFE82'),  # (آ, ﺁ, , , ﺂ), 
+    ('\u0623', '\uFE83', '', '', '\uFE84'),  # (أ, ﺃ, , , ﺄ), 
+    ('\u0624', '\uFE85', '', '', '\uFE86'),  # (ؤ, ﺅ, , , ﺆ), 
+    ('\u0625', '\uFE87', '', '', '\uFE88'),  # (إ, ﺇ, , , ﺈ), 
+    ('\u0626', '\uFE89', '\uFE8B', '\uFE8C', '\uFE8A'),  # (ئ, ﺉ, ﺋ, ﺌ, ﺊ), 
+    ('\u0627', '\uFE8D', '', '', '\uFE8E'),  # (ا, ﺍ, , , ﺎ), 
+    ('\u0628', '\uFE8F', '\uFE91', '\uFE92', '\uFE90'),  # (ب, ﺏ, ﺑ, ﺒ, ﺐ), 
+    ('\u0629', '\uFE93', '', '', '\uFE94'),  # (ة, ﺓ, , , ﺔ), 
+    ('\u062A', '\uFE95', '\uFE97', '\uFE98', '\uFE96'),  # (ت, ﺕ, ﺗ, ﺘ, ﺖ), 
+    ('\u062B', '\uFE99', '\uFE9B', '\uFE9C', '\uFE9A'),  # (ث, ﺙ, ﺛ, ﺜ, ﺚ), 
+    ('\u062C', '\uFE9D', '\uFE9F', '\uFEA0', '\uFE9E'),  # (ج, ﺝ, ﺟ, ﺠ, ﺞ), 
+    ('\u062D', '\uFEA1', '\uFEA3', '\uFEA4', '\uFEA2'),  # (ح, ﺡ, ﺣ, ﺤ, ﺢ), 
+    ('\u062E', '\uFEA5', '\uFEA7', '\uFEA8', '\uFEA6'),  # (خ, ﺥ, ﺧ, ﺨ, ﺦ), 
+    ('\u062F', '\uFEA9', '', '', '\uFEAA'),  # (د, ﺩ, , , ﺪ), 
+    ('\u0630', '\uFEAB', '', '', '\uFEAC'),  # (ذ, ﺫ, , , ﺬ), 
+    ('\u0631', '\uFEAD', '', '', '\uFEAE'),  # (ر, ﺭ, , , ﺮ), 
+    ('\u0632', '\uFEAF', '', '', '\uFEB0'),  # (ز, ﺯ, , , ﺰ), 
+    ('\u0633', '\uFEB1', '\uFEB3', '\uFEB4', '\uFEB2'),  # (س, ﺱ, ﺳ, ﺴ, ﺲ), 
+    ('\u0634', '\uFEB5', '\uFEB7', '\uFEB8', '\uFEB6'),  # (ش, ﺵ, ﺷ, ﺸ, ﺶ), 
+    ('\u0635', '\uFEB9', '\uFEBB', '\uFEBC', '\uFEBA'),  # (ص, ﺹ, ﺻ, ﺼ, ﺺ), 
+    ('\u0636', '\uFEBD', '\uFEBF', '\uFEC0', '\uFEBE'),  # (ض, ﺽ, ﺿ, ﻀ, ﺾ), 
+    ('\u0637', '\uFEC1', '\uFEC3', '\uFEC4', '\uFEC2'),  # (ط, ﻁ, ﻃ, ﻄ, ﻂ), 
+    ('\u0638', '\uFEC5', '\uFEC7', '\uFEC8', '\uFEC6'),  # (ظ, ﻅ, ﻇ, ﻈ, ﻆ), 
+    ('\u0639', '\uFEC9', '\uFECB', '\uFECC', '\uFECA'),  # (ع, ﻉ, ﻋ, ﻌ, ﻊ), 
+    ('\u063A', '\uFECD', '\uFECF', '\uFED0', '\uFECE'),  # (غ, ﻍ, ﻏ, ﻐ, ﻎ), 
+    ('\u0640', '\u0640', '\u0640', '\u0640', '\u0640'),  # (ـ, ـ, ـ, ـ, ـ), 
+    ('\u0641', '\uFED1', '\uFED3', '\uFED4', '\uFED2'),  # (ف, ﻑ, ﻓ, ﻔ, ﻒ), 
+    ('\u0642', '\uFED5', '\uFED7', '\uFED8', '\uFED6'),  # (ق, ﻕ, ﻗ, ﻘ, ﻖ), 
+    ('\u0643', '\uFED9', '\uFEDB', '\uFEDC', '\uFEDA'),  # (ك, ﻙ, ﻛ, ﻜ, ﻚ), 
+    ('\u0644', '\uFEDD', '\uFEDF', '\uFEE0', '\uFEDE'),  # (ل, ﻝ, ﻟ, ﻠ, ﻞ), 
+    ('\u0645', '\uFEE1', '\uFEE3', '\uFEE4', '\uFEE2'),  # (م, ﻡ, ﻣ, ﻤ, ﻢ), 
+    ('\u0646', '\uFEE5', '\uFEE7', '\uFEE8', '\uFEE6'),  # (ن, ﻥ, ﻧ, ﻨ, ﻦ), 
+    ('\u0647', '\uFEE9', '\uFEEB', '\uFEEC', '\uFEEA'),  # (ه, ﻩ, ﻫ, ﻬ, ﻪ), 
+    ('\u0648', '\uFEED', '', '', '\uFEEE'),  # (و, ﻭ, , , ﻮ), 
+    # ('\u0649', '\uFEEF', '\uFBE8', '\uFBE9', '\uFEF0'),  # (ى, ﻯ, ﯨ, ﯩ, ﻰ), 
+    ('\u0649', '\uFEEF', '', '', '\uFEF0'),   # (ى, ﻯ, , , ﻰ), 
+    ('\u064A', '\uFEF1', '\uFEF3', '\uFEF4', '\uFEF2'),  # (ي, ﻱ, ﻳ, ﻴ, ﻲ), 
+    ('\u0671', '\uFB50', '', '', '\uFB51'),  # (ٱ, ﭐ, , , ﭑ), 
+    ('\u0677', '\uFBDD', '', '', ''),  # (ٷ, ﯝ, , , ), 
+    ('\u0679', '\uFB66', '\uFB68', '\uFB69', '\uFB67'),  # (ٹ, ﭦ, ﭨ, ﭩ, ﭧ), 
+    ('\u067A', '\uFB5E', '\uFB60', '\uFB61', '\uFB5F'),  # (ٺ, ﭞ, ﭠ, ﭡ, ﭟ), 
+    ('\u067B', '\uFB52', '\uFB54', '\uFB55', '\uFB53'),  # (ٻ, ﭒ, ﭔ, ﭕ, ﭓ), 
+    ('\u067E', '\uFB56', '\uFB58', '\uFB59', '\uFB57'),  # (پ, ﭖ, ﭘ, ﭙ, ﭗ), 
+    ('\u067F', '\uFB62', '\uFB64', '\uFB65', '\uFB63'),  # (ٿ, ﭢ, ﭤ, ﭥ, ﭣ), 
+    ('\u0680', '\uFB5A', '\uFB5C', '\uFB5D', '\uFB5B'),  # (ڀ, ﭚ, ﭜ, ﭝ, ﭛ), 
+    ('\u0683', '\uFB76', '\uFB78', '\uFB79', '\uFB77'),  # (ڃ, ﭶ, ﭸ, ﭹ, ﭷ), 
+    ('\u0684', '\uFB72', '\uFB74', '\uFB75', '\uFB73'),  # (ڄ, ﭲ, ﭴ, ﭵ, ﭳ), 
+    ('\u0686', '\uFB7A', '\uFB7C', '\uFB7D', '\uFB7B'),  # (چ, ﭺ, ﭼ, ﭽ, ﭻ), 
+    ('\u0687', '\uFB7E', '\uFB80', '\uFB81', '\uFB7F'),  # (ڇ, ﭾ, ﮀ, ﮁ, ﭿ), 
+    ('\u0688', '\uFB88', '', '', '\uFB89'),  # (ڈ, ﮈ, , , ﮉ), 
+    ('\u068C', '\uFB84', '', '', '\uFB85'),  # (ڌ, ﮄ, , , ﮅ), 
+    ('\u068D', '\uFB82', '', '', '\uFB83'),  # (ڍ, ﮂ, , , ﮃ), 
+    ('\u068E', '\uFB86', '', '', '\uFB87'),  # (ڎ, ﮆ, , , ﮇ), 
+    ('\u0691', '\uFB8C', '', '', '\uFB8D'),  # (ڑ, ﮌ, , , ﮍ), 
+    ('\u0698', '\uFB8A', '', '', '\uFB8B'),  # (ژ, ﮊ, , , ﮋ), 
+    ('\u06A4', '\uFB6A', '\uFB6C', '\uFB6D', '\uFB6B'),  # (ڤ, ﭪ, ﭬ, ﭭ, ﭫ), 
+    ('\u06A6', '\uFB6E', '\uFB70', '\uFB71', '\uFB6F'),  # (ڦ, ﭮ, ﭰ, ﭱ, ﭯ), 
+    ('\u06A9', '\uFB8E', '\uFB90', '\uFB91', '\uFB8F'),  # (ک, ﮎ, ﮐ, ﮑ, ﮏ), 
+    ('\u06AD', '\uFBD3', '\uFBD5', '\uFBD6', '\uFBD4'),  # (ڭ, ﯓ, ﯕ, ﯖ, ﯔ), 
+    ('\u06AF', '\uFB92', '\uFB94', '\uFB95', '\uFB93'),  # (گ, ﮒ, ﮔ, ﮕ, ﮓ), 
+    ('\u06B1', '\uFB9A', '\uFB9C', '\uFB9D', '\uFB9B'),  # (ڱ, ﮚ, ﮜ, ﮝ, ﮛ), 
+    ('\u06B3', '\uFB96', '\uFB98', '\uFB99', '\uFB97'),  # (ڳ, ﮖ, ﮘ, ﮙ, ﮗ), 
+    ('\u06BA', '\uFB9E', '', '', '\uFB9F'),  # (ں, ﮞ, , , ﮟ), 
+    ('\u06BB', '\uFBA0', '\uFBA2', '\uFBA3', '\uFBA1'),  # (ڻ, ﮠ, ﮢ, ﮣ, ﮡ), 
+    ('\u06BE', '\uFBAA', '\uFBAC', '\uFBAD', '\uFBAB'),  # (ھ, ﮪ, ﮬ, ﮭ, ﮫ), 
+    ('\u06C0', '\uFBA4', '', '', '\uFBA5'),  # (ۀ, ﮤ, , , ﮥ), 
+    ('\u06C1', '\uFBA6', '\uFBA8', '\uFBA9', '\uFBA7'),  # (ہ, ﮦ, ﮨ, ﮩ, ﮧ), 
+    ('\u06C5', '\uFBE0', '', '', '\uFBE1'),  # (ۅ, ﯠ, , , ﯡ), 
+    ('\u06C6', '\uFBD9', '', '', '\uFBDA'),  # (ۆ, ﯙ, , , ﯚ), 
+    ('\u06C7', '\uFBD7', '', '', '\uFBD8'),  # (ۇ, ﯗ, , , ﯘ), 
+    ('\u06C8', '\uFBDB', '', '', '\uFBDC'),  # (ۈ, ﯛ, , , ﯜ), 
+    ('\u06C9', '\uFBE2', '', '', '\uFBE3'),  # (ۉ, ﯢ, , , ﯣ), 
+    ('\u06CB', '\uFBDE', '', '', '\uFBDF'),  # (ۋ, ﯞ, , , ﯟ), 
+    ('\u06CC', '\uFBFC', '\uFBFE', '\uFBFF', '\uFBFD'),  # (ی, ﯼ, ﯾ, ﯿ, ﯽ), 
+    ('\u06D0', '\uFBE4', '\uFBE6', '\uFBE7', '\uFBE5'),  # (ې, ﯤ, ﯦ, ﯧ, ﯥ), 
+    ('\u06D2', '\uFBAE', '', '', '\uFBAF'),  # (ے, ﮮ, , , ﮯ), 
+    ('\u06D3', '\uFBB0', '', '', '\uFBB1'),  # (ۓ, ﮰ, , , ﮱ), 
+    ('\uFEFB', '\uFEFB', '', '', '\uFEFC'),  # (ﻻ, ﻻ, , , ﻼ), 
+    ('\uFEF7', '\uFEF7', '', '', '\uFEF8'),  # (ﻷ, ﻷ, , , ﻸ), 
+    ('\uFEF5', '\uFEF5', '', '', '\uFEF6'),  # (ﻵ, ﻵ, , , ﻶ), 
+)
 
 
-arabic_ranges_pattern = r'[\u0600-\u06FF]|[\u0750-\u077F]|[\uFB50-\uFDFF]|[\uFE70-\uFEFF]'
+mandatory_liga_table = {
+    ('\uFEDF', '\uFE82'): '\uFEF5',  # ['ﻟ', 'ﺂ', 'ﻵ']
+    ('\uFEDF', '\uFE84'): '\uFEF7',  # ['ﻟ', 'ﺄ', 'ﻷ']
+    ('\uFEDF', '\uFE88'): '\uFEF9',  # ['ﻟ', 'ﺈ', 'ﻹ']
+    ('\uFEDF', '\uFE8E'): '\uFEFB',  # ['ﻟ', 'ﺎ', 'ﻻ']
+    ('\uFEE0', '\uFE82'): '\uFEF6',  # ['ﻠ', 'ﺂ', 'ﻶ']
+    ('\uFEE0', '\uFE84'): '\uFEF8',  # ['ﻠ', 'ﺄ', 'ﻸ']
+    ('\uFEE0', '\uFE88'): '\uFEFA',  # ['ﻠ', 'ﺈ', 'ﻺ']
+    ('\uFEE0', '\uFE8E'): '\uFEFC',  # ['ﻠ', 'ﺎ', 'ﻼ']
+    }
 
-# Arabic letters forms: base, isolated, end, middle, beginning
-chars = [
-    ['0627', 'fe8d', 'fe8e', '', ''],  # ['ا', 'ﺍ', 'ﺎ']
-    ['0623', 'fe83', 'fe84', '', ''],  # ['ﺃ', 'ﺃ', 'ﺄ']
-    ['0625', 'fe87', 'fe88', '', ''],  # ['ﺇ', 'ﺇ', 'ﺈ']
-    ['0622', 'fe81', 'fe82', '', ''],  # ['آ', 'ﺁ', 'ﺂ']
-    ['0624', 'fe85', 'fe86', '', ''],  # ['ﺅ', 'ﺅ', 'ﺆ']
-    ['0626', 'fe89', 'fe8a', 'fe8c', 'fe8b'],  # ['ﺉ', 'ﺉ', 'ﺊ', 'ﺌ', 'ﺋ']
-    ['0628', 'fe8f', 'fe90', 'fe92', 'fe91'],  # ['ب', 'ﺏ', 'ﺐ', 'ﺒ', 'ﺑ']
-    ['062a', 'fe95', 'fe96', 'fe98', 'fe97'],  # ['ت', 'ﺕ', 'ﺖ', 'ﺘ', 'ﺗ']
-    ['062b', 'fe99', 'fe9a', 'fe9c', 'fe9b'],  # ['ث', 'ﺙ', 'ﺚ', 'ﺜ', 'ﺛ']
-    ['062c', 'fe9d', 'fe9e', 'fea0', 'fe9f'],  # ['ج', 'ﺝ', 'ﺞ', 'ﺠ', 'ﺟ']
-    ['062d', 'fea1', 'fea2', 'fea4', 'fea3'],  # ['ح', 'ﺡ', 'ﺢ', 'ﺤ', 'ﺣ']
-    ['062e', 'fea5', 'fea6', 'fea8', 'fea7'],  # ['خ', 'ﺥ', 'ﺦ', 'ﺨ', 'ﺧ']
-    ['062f', 'fea9', 'feaa', '', ''],  # ['د', 'ﺩ', 'ﺪ']
-    ['0630', 'feab', 'feac', '', ''],  # ['ذ', 'ﺫ', 'ﺬ']
-    ['0631', 'fead', 'feae', '', ''],  # ['ر', 'ﺭ', 'ﺮ'
-    ['0632', 'feaf', 'feb0', '', ''],  # ['ز', 'ﺯ', 'ﺰ']
-    ['0633', 'feb1', 'feb2', 'feb4', 'feb3'],  # ['س', 'ﺱ', 'ﺲ', 'ﺴ', 'ﺳ']
-    ['0634', 'feb5', 'feb6', 'feb8', 'feb7'],  # ['ش', 'ﺵ', 'ﺶ', 'ﺸ', 'ﺷ']
-    ['0635', 'feb9', 'feba', 'febc', 'febb'],  # ['ص', 'ﺹ', 'ﺺ', 'ﺼ', 'ﺻ']
-    ['0636', 'febd', 'febe', 'fec0', 'febf'],  # ['ض', 'ﺽ', 'ﺾ', 'ﻀ', 'ﺿ']
-    ['0637', 'fec1', 'fec2', 'fec4', 'fec3'],  # ['ط', 'ﻁ', 'ﻂ', 'ﻄ', 'ﻃ']
-    ['0638', 'fec5', 'fec6', 'fec8', 'fec7'],  # ['ظ', 'ﻅ', 'ﻆ', 'ﻈ', 'ﻇ']
-    ['0639', 'fec9', 'feca', 'fecc', 'fecb'],  # ['ع', 'ﻉ', 'ﻊ', 'ﻌ', 'ﻋ']
-    ['063a', 'fecd', 'fece', 'fed0', 'fecf'],  # ['غ', 'ﻍ', 'ﻎ', 'ﻐ', 'ﻏ']
-    ['0641', 'fed1', 'fed2', 'fed4', 'fed3'],  # ['ف', 'ﻑ', 'ﻒ', 'ﻔ', 'ﻓ']
-    ['0642', 'fed5', 'fed6', 'fed8', 'fed7'],  # ['ق', 'ﻕ', 'ﻖ', 'ﻘ', 'ﻗ']
-    ['0643', 'fed9', 'feda', 'fedc', 'fedb'],  # ['ك', 'ﻙ', 'ﻚ', 'ﻜ', 'ﻛ']
-    ['0644', 'fedd', 'fede', 'fee0', 'fedf'],  # ['ل', 'ﻝ', 'ﻞ', 'ﻠ', 'ﻟ']
-    ['0645', 'fee1', 'fee2', 'fee4', 'fee3'],  # ['م', 'ﻡ', 'ﻢ', 'ﻤ', 'ﻣ']
-    ['0646', 'fee5', 'fee6', 'fee8', 'fee7'],  # ['ن', 'ﻥ', 'ﻦ', 'ﻨ', 'ﻧ']
-    ['0647', 'fee9', 'feea', 'feec', 'feeb'],  # ['ه', 'ﻩ', 'ﻪ', 'ﻬ', 'ﻫ']
-    ['0648', 'feed', 'feee', '', ''],  # ['و', 'ﻭ', 'ﻮ']
-    ['064a', 'fef1', 'fef2', 'fef4', 'fef3'],  # ['ي', 'ﻱ', 'ﻲ', 'ﻴ', 'ﻳ']
+HARAKAT_RE = re.compile(
+    '['
+    '\u0610-\u061a'
+    '\u064b-\u065f'
+    '\u0670'
+    '\u06d6-\u06dc'
+    '\u06df-\u06e8'
+    '\u06ea-\u06ed'
+    '\u08d4-\u08e1'
+    '\u08d4-\u08ed'
+    '\u08e3-\u08ff'
+    ']',
 
-    ['0629', 'fe93', 'fe94', '', ''],  # ['ة', 'ﺓ', 'ﺔ']
-    ['0649', 'feef', 'fef0', '', ''],  # ['ى', 'ﻯ', 'ﻰ']
-    ['fefb', 'fefb', 'fefc', '', ''],  # ['ﻻ', 'ﻻ', 'ﻼ']
-    ['fef7', 'fef7', 'fef8', '', ''],  # ['ﻷ', 'ﻷ', 'ﻸ']
-    ['fef9', 'fef9', 'fefa', '', ''],  # ['ﻹ', 'ﻹ', 'ﻺ']
-    ['fef5', 'fef5', 'fef6', '', ''],  # ['ﻵ', 'ﻵ', 'ﻶ']
-]
+    re.UNICODE | re.X
+    )
 
-# convert hex codes to int
-chars = [[hex2int(x) for x in d] for d in chars]
+ARABIC_RE = re.compile(
+    '['
+    '\u0600-\u060A'
+    '\u060C-\u06FF'
+    '\u0750-\u077F'
+    '\u08A0-\u08FF'
+    '\u206C-\u206D'
+    '\uFB50-\uFD3D'
+    '\uFD50-\uFDFB'
+    '\uFE70-\uFEFC'
+    ']',
+    re.UNICODE | re.X
+    )
 
-# map lam-alif to a proper alif
-lamalif_to_alif = {'fef5': '0622', 'fef7': '0623', 'fef9': '0625', 'fefb': '0627'}
+NUMBERS_RE = re.compile(
+    '['
+    '\u0660-\u0669'  # indic numbers
+    '\u0030-\u0039'  # arabic numbers
+    ']',
 
-# convert to int
-lamalif_to_alif = {int(k, 16): int(v, 16) for k, v in lamalif_to_alif.items()}
+    re.UNICODE | re.X)
 
+NEUTRAL_RE = re.compile(
+    '['
+    '\u0000-\u0040'  
+    '\u005B-\u0060'  
+    '\u007B-\u007F'  
+    ']',
 
-def get_base_char(c):
-    k = ord(c)
-    v = [v for v in chars if k in v]
-    if v:
-        k = v[0][0]
-    c = chr(k)
-    return c
+    re.UNICODE | re.X)
 
 
-def get_base_text(text):
-    l = [get_base_char(c) for c in text]
+def remove_harakat(text):
+    result = [c for c in text if not HARAKAT_RE.match(c)]
+    # print(HARAKAT_RE.match(c))
+    return ''.join(result)
 
-    unwanted_char = chr(65279)
-    if unwanted_char in l:
-        l.remove(unwanted_char)
+
+def do_ligation(text):
+    result = []
+
+    for i, c in enumerate(text):
+        shape = mandatory_liga_table.get((c, text[i - 1]), None)
+        if shape:
+            result.pop()
+            result.append(shape)
+        else:
+            result.append(c)
+
+    return ''.join(result)
+
+
+def do_shaping(text):
+    def get_shapes(c):
+        # get all different letter shapes 
+        if c is None:
+            return {}
+        key = c 
+        match = [v for v in shapes_table if key in v]
+        if match:
+            match = match[0]
+            return {ISOLATED: match[1], INITIAL: match[2], MEDIAL: match[3], FINAL: match[4]}
+        else:
+            return {}
+
+    def get_shape(c, right_char, left_char):
+        """get a proper letter shape
+        Args:
+            c: current letter
+            right_char: letter before
+            left_char: letter after
+        """
+        c_shapes = get_shapes(c)
+
+        if c_shapes and c_shapes.get(FINAL):
+            # letter is arabic
+            right_char_shapes = get_shapes(right_char)
+            left_char_shapes = get_shapes(left_char)
+
+            position = MEDIAL if right_char_shapes.get(MEDIAL) else INITIAL
+            alternative = {MEDIAL: FINAL, INITIAL: ISOLATED}
+            if not isarabic(left_char):
+                position = alternative[position]
+            elif not left_char_shapes.get(FINAL):
+                position = ISOLATED
+
+            c = c_shapes.get(position) or c_shapes.get(alternative[position])
+
+          
+        return c
+
     t = []
-    for c in l:
-        # remove zero size letter fribidi add to lam-alif
-        if c == chr(65279):
-            continue
-        # dissolve lam-alif to separate lam and alif
-        if ord(c) in lamalif_to_alif:
-            alif = chr(lamalif_to_alif[ord(c)])
-            lam_char = chr(int('0644', 16))
-            t.append(alif)
-            t.append(lam_char)
-            continue
-        t.append(c)
+    for i in range(len(text) - 1, -1, -1):
+        c = text[i]
+        right_char = text[i + 1] if i < len(text) - 1 else None
+        left_char = text[i - 1] if i > 0 else None
+        t.insert(0, get_shape(c, right_char, left_char))
+    return ''.join(t)
 
-    text = ''.join(t)
+
+def reshaper(text):
+    text = do_shaping(text)
+    text = do_ligation(text)
+    text = remove_harakat(text)
     return text
 
 
 def render_bidi_text(text):
-    return pyfribidi.log2vis(text, pyfribidi.ON)
-
-
-def is_neutral(c):
-    """control symbols and punctuation"""
-    try:
-        key = ord(c)
-        if key in range(0x0, 0x40) or key in range(0x5b, 0x60) or key in range(0x7b, 0x7f):
-            return True
-    except:
-        pass
-
-    return False
+    text = get_display(text)
+    text = reshaper(text)
+    
+    return text
 
 
 def isarabic(c):
     if isinstance(c, str):
-        match = re.match(arabic_ranges_pattern, c)
-        # print(match)
+        match = ARABIC_RE.match(c)
+        return match
+    return False
+
+
+def is_neutral(c):
+    if isinstance(c, str):
+        match = NEUTRAL_RE.match(c)
         return match
     return False
 
@@ -143,22 +269,22 @@ def handle_entry(event, widget):
         new_index = current_index - 1 if current_index >= 1 else 0
         widget.icursor(new_index)
 
-    text = widget._get()
 
+    c = event.char
+    text = widget._get()
     index = widget.index('insert')
 
-    # get charcters left, and right the cursor
-    char_left = text[index - 1] if index > 0 else None
-    char_right = text[index] if len(text) > index else None
+    if not (c or event.keysym in ('BackSpace', 'Delete') or isarabic(c) or is_neutral(c)):
+        return
 
-    if isarabic(char_left) or isarabic(char_right):
+    if NUMBERS_RE.match(event.char):
+        return
+
+    if isarabic(c):
         widget.RTL = True
-        # print('RTL=TRUE')
-    elif not is_neutral(event.char):
-        widget.RTL = False
-
+        move_cursor_to_left()
     # handle backspace
-    if event.keysym in ('BackSpace', 'Delete'):
+    elif event.keysym in ('BackSpace', 'Delete'):
         try:
             widget.delete("sel.first", "sel.last")
         except:
@@ -167,21 +293,21 @@ def handle_entry(event, widget):
             elif index > 0:
                 widget.delete(index - 1)
 
-    elif widget.last_text == widget._get():
+    elif is_neutral(c) and widget.RTL:
+        move_cursor_to_left()
+    else:
+        widget.RTL = False
+
+
+    if widget.last_text == widget._get():
         return
 
-    # decide cursor movement
-    elif widget.RTL:
-        move_cursor_to_left()
-
+   
     text = widget._get()
     index = widget.index('insert')
     widget.delete(0, "end")
 
-    text = get_base_text(text)
-    text = render_bidi_text(text)
-    text = get_base_text(text)
-    text = render_bidi_text(text)
+    text = reshaper(text)
 
     widget.insert(0, text)
     widget.icursor(index)
