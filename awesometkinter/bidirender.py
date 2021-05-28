@@ -364,7 +364,12 @@ if __name__ == '__main__':
     text = 'السلام عليكم'
 
     # text display incorrectly on linux
-    tk.Label(root, text=text, font='any 20').pack()
+    dummyvar = tk.StringVar()
+    dummyvar.set(text)
+    tk.Label(root, textvariable=dummyvar, font='any 20').pack()
+
+    # uncomment below to set a rendered text to first label
+    dummyvar.set(render_bidi_text(text))
 
     entry = tk.Entry(root, font='any 20', justify='right')
     entry.pack()
