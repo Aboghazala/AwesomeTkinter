@@ -25,26 +25,31 @@ from .utils import configure_widget
 
 class ToolTip:
 
-    def __init__(self, widget, text, **kwargs):
+    def __init__(self, widget, text, waittime = 500, xoffset=10, yoffset=10, **kwargs):
         """
         tooltip class
 
         Args:
             widget: any tkinter widget
             text: tooltip text
+            waittime: time in milliseconds to wait before showing tooltip
+            xoffset(int): x - offset (pixels) of tooltip box from mouse pointer 
+            yoffset(int): y - offset (pixels) of tooltip box from mouse pointer 
             kwargs: parameters to be passed to tooltip label, e.g: , background='red', foreground='blue', etc
 
         """
         self.widget = widget
-        self.waittime = 500  # milliseconds
         self.text = text
+        self.waittime = waittime  # milliseconds
+        self.xoffset = xoffset
+        self.yoffset = yoffset
         self.kwargs = kwargs
         self.tipwindow = None
         self.id = None
-        self.x = self.y = 0
-        self._id1 = self.widget.bind("<Enter>", self.enter)
-        self._id2 = self.widget.bind("<Leave>", self.leave)
-        self._id3 = self.widget.bind("<ButtonPress>", self.leave)
+        self.label = None
+        self._id1 = self.widget.bind("<Enter>", self.enter, add='+')
+        self._id2 = self.widget.bind("<Leave>", self.leave, add='+')
+        self._id3 = self.widget.bind("<ButtonPress>", self.leave, add='+')
 
         # for dynamic tooltip, use widget.update_tooltip('new text')
         widget.update_tooltip = self.update_tooltip
@@ -63,6 +68,10 @@ class ToolTip:
 
     def update_tooltip(self, text):
         self.text = text
+        try:
+            self.label.config(text=text)
+        except:
+            pass
 
     def enter(self, event=None):
         self.schedule()
@@ -76,10 +85,9 @@ class ToolTip:
         self.id = self.widget.after(self.waittime, self.showtip)
 
     def unschedule(self):
-        id = self.id
-        self.id = None
-        if id:
-            self.widget.after_cancel(id)
+        if self.id:
+            self.widget.after_cancel(self.id)
+            self.id = None
 
     def showtip(self):
         if self.tipwindow:
@@ -92,8 +100,8 @@ class ToolTip:
         # y = self.widget.winfo_rooty() + self.widget.winfo_height() + 1
 
         # or show it under mouse position with offset
-        x = self.widget.winfo_pointerx() + 10
-        y = self.widget.winfo_pointery() + 10
+        x = self.widget.winfo_pointerx() + self.xoffset
+        y = self.widget.winfo_pointery() + self.yoffset
 
         self.tipwindow = tw = tk.Toplevel(self.widget)
     
@@ -102,19 +110,17 @@ class ToolTip:
 
         tw.wm_geometry("+%d+%d" % (x, y))
  
-        label = ttk.Label(self.tipwindow, text=self.text, justify=tk.LEFT, padding=(5, 2),
+        self.label = ttk.Label(self.tipwindow, text=self.text, justify=tk.LEFT, padding=(5, 2),
                           background="#ffffe0", relief=tk.SOLID, borderwidth=1)
 
-        configure_widget(label, **self.kwargs)
-        label.pack()
-
+        configure_widget(self.label, **self.kwargs)
+        self.label.pack()
 
 
     def hidetip(self):
-        tw = self.tipwindow  # not sure why using another local variable
-        self.tipwindow = None
-        if tw:
-            tw.destroy()
+        if self.tipwindow:
+            self.tipwindow.destroy()
+            self.tipwindow = None
 
 
 tooltip = ToolTip
