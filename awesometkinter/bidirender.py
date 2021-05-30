@@ -103,7 +103,6 @@ shapes_table = (
     ('\uFEF5', '\uFEF5', '', '', '\uFEF6'),  # (ﻵ, ﻵ, , , ﻶ), 
 )
 
-
 mandatory_liga_table = {
     ('\uFEDF', '\uFE82'): '\uFEF5',  # ['ﻟ', 'ﺂ', 'ﻵ']
     ('\uFEDF', '\uFE84'): '\uFEF7',  # ['ﻟ', 'ﺄ', 'ﻷ']
@@ -238,6 +237,23 @@ def reshaper(text):
     return text
 
 
+def vis2log(text):
+    # convert visual text to logical
+
+    # get unshaped characters
+    unshaped_text = []
+    for c in text:
+        match = [item[0] for item in shapes_table if c in item]
+        if match:
+            c = match[0]
+        unshaped_text.append(c)
+
+    # reverse text order to its original state
+    text = get_display(''.join(unshaped_text))
+
+    return text
+
+
 def render_bidi_text(text):
     text = get_display(text)
     text = reshaper(text)
@@ -327,7 +343,7 @@ def add_bidi_support_for_entry(widget):
     widget.bind("<BackSpace>", handledeletion)
     widget.bind("<Delete>", handledeletion)
     widget._get = widget.get
-    widget.get = lambda: render_bidi_text(widget._get())
+    widget.get = lambda: vis2log(widget._get())
 
     def set_text(text):
         widget.delete(0, "end")
@@ -342,7 +358,7 @@ def add_bidi_support_for_label(widget):
     """add arabic support for an entry widget"""
 
     def get_text():
-        return render_bidi_text(widget['text'])
+        return vis2log(widget['text'])
 
     def set_text(text):
         widget['text'] = render_bidi_text(text)
