@@ -237,7 +237,7 @@ def reshaper(text):
     return text
 
 
-def vis2log(text):
+def derender_bidi_text(text):
     # convert visual text to logical
 
     # get unshaped characters
@@ -343,7 +343,7 @@ def add_bidi_support_for_entry(widget):
     widget.bind("<BackSpace>", handledeletion)
     widget.bind("<Delete>", handledeletion)
     widget._get = widget.get
-    widget.get = lambda: vis2log(widget._get())
+    widget.get = lambda: derender_bidi_text(widget._get())
 
     def set_text(text):
         widget.delete(0, "end")
@@ -358,7 +358,7 @@ def add_bidi_support_for_label(widget):
     """add arabic support for an entry widget"""
 
     def get_text():
-        return vis2log(widget['text'])
+        return derender_bidi_text(widget['text'])
 
     def set_text(text):
         widget['text'] = render_bidi_text(text)
