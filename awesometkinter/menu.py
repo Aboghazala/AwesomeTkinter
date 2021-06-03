@@ -10,7 +10,8 @@ import tkinter as tk
 
 class RightClickMenu(tk.Menu):
     """Context menu or right click menu popup"""
-    def __init__(self, parent, menu_items, callback=None, bg='white', fg='black', abg='blue', afg='white'):
+    def __init__(self, parent, menu_items, callback=None, bg='white', fg='black', abg='blue', afg='white', 
+                 bind_left_click=False, bind_right_click=True):
         """initialize
         Args:
             parent: tkinter widget to show this menu when right clicked
@@ -22,6 +23,8 @@ class RightClickMenu(tk.Menu):
             fg: text color
             abg: background color on mouse hover
             afg: text color on mouse hover
+            bind_left_click: if true will bind left mouse click
+            bind_right_click: if true will bind right mouse click
 
         Example:
             right_click_map = {'say hi': lambda x: print(x),  # x = 'say hi'
@@ -44,10 +47,31 @@ class RightClickMenu(tk.Menu):
             else:
                 self.add_command(label=f' {option}', command=lambda x=option: self.context_menu_handler(x))
 
-        parent.bind("<Button-3>", self.popup, add='+')
-        parent.bind("<Button-2>", self.popup, add='+')
-
         self.parent = parent
+
+        # prevent random selection if menu shows under mouse 
+        self.pressflag = False
+        def onpress(event):
+            self.pressflag = True
+
+        def onrelease(event):
+            # diable mouse release action if no mouse press
+            if not self.pressflag:
+                return 'break'
+            else:
+                self.pressflag = False
+
+        trigger_buttons = []
+        if bind_left_click:
+            trigger_buttons.append(1)
+        if bind_right_click:
+            trigger_buttons += [2, 3]
+
+        for i in trigger_buttons:
+            parent.bind(f"<Button-{i}>", self.popup, add='+')
+            self.bind(f'<{i}>', onpress, add='+')
+            self.bind(f'<ButtonRelease-{i}>', onrelease, add='+')
+
 
     def popup(self, event):
         """show right click menu"""
