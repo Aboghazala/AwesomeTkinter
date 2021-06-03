@@ -8,9 +8,12 @@
 
 """
 
+import os
 import tkinter as tk
 import re
 from bidi.algorithm import get_display
+
+from .menu import RightClickMenu
 
 UNSHAPED = 0
 ISOLATED = 1
@@ -237,6 +240,13 @@ def reshaper(text):
     return text
 
 
+def render_bidi_text(text):
+    text = get_display(text)
+    text = reshaper(text)
+    
+    return text
+
+
 def derender_bidi_text(text):
     # convert visual text to logical
 
@@ -254,11 +264,81 @@ def derender_bidi_text(text):
     return text
 
 
-def render_bidi_text(text):
-    text = get_display(text)
-    text = reshaper(text)
-    
-    return text
+def split_path(path):
+    """
+    split path into individual parts
+
+    Args:
+        path(str): string representation of a path, e.g: '/home/Desktop'
+
+    Return:
+        list of splitted path
+
+    credit: https://www.oreilly.com/library/view/python-cookbook/0596001673/ch04s16.html
+    """
+
+    allparts = []
+    while 1:
+        parts = os.path.split(path)
+        if parts[0] == path:  # sentinel for absolute paths
+            allparts.insert(0, parts[0])
+            break
+        elif parts[1] == path: # sentinel for relative paths
+            allparts.insert(0, parts[1])
+            break
+        else:
+            path = parts[0]
+            allparts.insert(0, parts[1])
+    return allparts
+
+
+def render_bidi_path(path):
+    """
+    render bidi words in path string
+
+    Args:
+        path(str): string representation of a path, e.g: '/home/Desktop'
+
+    Return:
+        (str) rendered path
+
+    """
+    parts = split_path(path)
+    parts = [render_bidi_text(x) for x in parts]
+    return os.path.join(*parts)
+
+
+def derender_bidi_path(path):
+    """
+    reverse of render_bidi_path
+    """
+    parts = split_path(path)
+    parts = [derender_bidi_text(x) for x in parts]
+    return os.path.join(*parts)
+
+
+def render_text(text, ispath=False):
+    """
+    render bidi text
+
+    Args:
+        text(str): input text that contains a bidi words e.g: English words mixed with Arabic words
+        ispath(bool): whether the text argument is path or not, e.g: '/usr/bin/etc'
+
+    Returns:
+        (str): rendered text
+    """
+    if ispath:
+        return render_bidi_path(text)
+    else:
+        return render_bidi_text(text)
+
+
+def derender_text(text, ispath=False):
+    if ispath:
+        return derender_bidi_path(text)
+    else:
+        return derender_bidi_text(text)
 
 
 def isarabic(c):
@@ -367,12 +447,84 @@ def add_bidi_support_for_label(widget):
     widget.set = set_text
 
 
-def add_bidi_support(widget):
+def add_bidi_support(widget, render_copy_paste=True, copy_paste_menu=False, ispath=False):
     """add bidi support for tkinter widget """
     if widget.winfo_class() == 'Label':
         add_bidi_support_for_label(widget)
     elif widget.winfo_class() == 'Entry':
         add_bidi_support_for_entry(widget)
+        if render_copy_paste:
+            override_copy_paste(widget, ispath=ispath, copy_paste_menu=copy_paste_menu)
+
+
+def override_copy_paste(widget, copyrender=derender_text, pasterender=render_text, ispath=False, copy_paste_menu=False):
+
+    
+    def copy(value):
+        """copy clipboard value
+
+        Args:
+            value (str): value to be copied to clipboard
+        """
+        try:
+            widget.clipboard_clear()
+            widget.clipboard_append(str(value))
+        except:
+            pass
+
+    def paste():
+        """get clipboard value"""
+        try:
+            value = widget.clipboard_get()
+        except:
+            value = ''
+
+        return value
+
+    def copy_callback(*args):
+        try:
+            selected_text = widget.selection_get()
+            derendered_text = copyrender(selected_text, ispath=ispath)
+            copy(derendered_text)
+        except:
+            pass
+
+        return 'break'
+
+    def paste_callback(*args):
+        try:
+            widget.delete("sel.first", "sel.last")
+        except:
+            pass
+
+        try:
+            text = paste()
+            rendered_text = pasterender(text, ispath=ispath)
+            widget.insert(tk.INSERT, rendered_text)
+        except:
+            pass
+
+        return 'break'
+
+    # bind
+    widget.bind("<<Copy>>", copy_callback)
+    widget.bind("<<Paste>>", paste_callback)
+
+    # reference copy paste
+    widget.copy_callback = copy_callback
+    widget.paste_callback = paste_callback
+
+    # right click menu
+    def rcm_handler(option):
+        if option.lower() == 'copy':
+            copy_callback()
+        else:
+            paste_callback()
+
+    if copy_paste_menu:
+        widget.rcm = RightClickMenu(widget, ['copy', 'paste'], callback=rcm_handler)
+
+
 
 
 if __name__ == '__main__':
