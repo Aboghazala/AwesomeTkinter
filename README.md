@@ -13,6 +13,7 @@ current available widgets:
 - Scrollable text widget
 - radiobutton with better indicator/check mark quality.
 - simple scrollbar "without arrow heads"
+- tooltip
 
 new widgets are coming soon
 
@@ -23,7 +24,7 @@ Added support to bidi language e.g. Arabic to be shown properly in tkinter widge
 
 ```
 import tkinter as tk
-from awesometkinter.bidirender import add_bidi_support, render_bidi_text
+from awesometkinter.bidirender import add_bidi_support, render_text
 root = tk.Tk()
 
 text = 'السلام عليكم'
@@ -34,7 +35,7 @@ dummyvar.set(text)
 tk.Label(root, textvariable=dummyvar, font='any 20').pack()
 
 # uncomment below to set a rendered text to first label
-# dummyvar.set(render_bidi_text(text))
+# dummyvar.set(render_text(text))
 
 entry = tk.Entry(root, font='any 20', justify='right')
 entry.pack()
@@ -46,10 +47,9 @@ lbl.pack()
 add_bidi_support(lbl)
 add_bidi_support(entry)
 
-# we can use set() and get() methods to set and get text on a widget
+# now there is a new set() and get() methods to set and get text on a widget
 entry.set(text)
 lbl.set('هذا كتاب adventure شيق')
-
 
 root.mainloop()
 ```
@@ -128,9 +128,61 @@ bar = atk.RadialProgressbar(f2, fg='green')
 bar.pack(padx=30, pady=30)
 bar.start()
 
-atk.Button3d(f2, text='Pressed Button').pack(pady=10)
+atk.Button3d(f2, text='Button2').pack(pady=10)
 
 root.mainloop()
+```
+
+# ToolTip
+
+you can enable tooltip for tkinter widgets on mouse hover, signature and arguments like below
+
+```python
+class ToolTip:
+    def __init__(self, widget, text, waittime=500, xoffset=10, yoffset=10, **kwargs):
+        """
+        tooltip class
+
+        Args:
+            widget: any tkinter widget
+            text: tooltip text
+            waittime: time in milliseconds to wait before showing tooltip
+            xoffset(int): x - offset (pixels) of tooltip box from mouse pointer 
+            yoffset(int): y - offset (pixels) of tooltip box from mouse pointer 
+            kwargs: parameters to be passed to tooltip label, e.g: , background='red', foreground='blue', etc
+
+        """
+
+```
+
+Tooltip Example:
+
+```python
+import tkinter as tk
+import awesometkinter as atk
+
+root = tk.Tk()
+btn = tk.Button(root, text="Hello", command=root.destroy)
+btn.pack()
+atk.tooltip(btn, "Hello world")  # you can pass a lot of arguments to control tooltip
+
+# Now we can modify any property thru the widget.tooltip reference
+# btn.tooltip.waittime = 2000
+# btn.tooltip.text= 'new text'
+
+# Also we can dynamically change tooltip as follows:
+x = 0
+def foo():
+    # change tooltip every second to mimic progress
+    global x
+    x += 1
+    btn.tooltip.update_tooltip('Progress: ' + str(x) + '%')
+    root.after(1000, foo)
+
+foo()
+
+root.mainloop()
+
 ```
 
 also, you can use a lot of useful functions that manipulate images, e.g.
