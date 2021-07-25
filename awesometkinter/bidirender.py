@@ -356,7 +356,10 @@ def is_neutral(c):
 
 
 def handle_entry(event, widget):
-    if widget.focus_get() != widget:
+    try:
+        if widget.focus_get() != widget:  # sometimes it raise an exception
+            return
+    except:
         return
 
     def move_cursor_to_left():
@@ -458,7 +461,6 @@ def add_bidi_support(widget, render_copy_paste=True, copy_paste_menu=False, ispa
 
 
 def override_copy_paste(widget, copyrender=derender_text, pasterender=render_text, ispath=False, copy_paste_menu=False):
-
     
     def copy(value):
         """copy clipboard value
@@ -523,8 +525,6 @@ def override_copy_paste(widget, copyrender=derender_text, pasterender=render_tex
 
     if copy_paste_menu:
         widget.rcm = RightClickMenu(widget, ['copy', 'paste'], callback=rcm_handler)
-
-
 
 
 if __name__ == '__main__':
