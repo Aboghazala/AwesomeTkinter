@@ -1,3 +1,6 @@
+2021.7.25:
+- fix error sometimes raised by entry bidi-handler.
+
 2021.6.4:
 - Add tooltip to tkinter widgets.
 - used python-bidi and custom reshaper instead of pyfribidi.
