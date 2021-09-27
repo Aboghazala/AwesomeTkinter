@@ -102,6 +102,9 @@ class ScrolledText(tk.Text):
         self.place = self.fr.place
         self.place_forget = self.fr.place_forget
 
+        # for compatibility
+        self.text = self
+
     def set(self, text):
         """replace contents"""
         self.clear()
