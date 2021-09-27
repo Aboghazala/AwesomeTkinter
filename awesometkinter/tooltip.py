@@ -5,27 +5,18 @@
 
     Description:
         tooltip popup window for tkinter widgets on mouse hover
-        based on code from https://svn.python.org/projects/python/trunk/Lib/idlelib/ToolTip.py
-
-        original author notes:
-            general purpose 'tooltip' routines - currently unused in idlefork
-            (although the 'calltips' extension is partly based on this code)
-            may be useful for some purposes in (or almost in ;) the current project scope
-            Ideas gleaned from PySol
+        some parts inspired from https://svn.python.org/projects/python/trunk/Lib/idlelib/ToolTip.py
 
 """
 
-
 import tkinter as tk
-from tkinter import ttk
 
 __package__ = 'awesometkinter'
-from .utils import configure_widget
 
 
-class ToolTip:
+class ToolTip(tk.Menu):
 
-    def __init__(self, widget, text, waittime=500, xoffset=10, yoffset=10, **kwargs):
+    def __init__(self, widget, text, waittime=500, xoffset=10, yoffset=10, bg="#ffffe0", fg='black', **kwargs):
         """
         tooltip class
 
@@ -33,44 +24,37 @@ class ToolTip:
             widget: any tkinter widget
             text: tooltip text
             waittime: time in milliseconds to wait before showing tooltip
-            xoffset(int): x - offset (pixels) of tooltip box from mouse pointer 
-            yoffset(int): y - offset (pixels) of tooltip box from mouse pointer 
-            kwargs: parameters to be passed to tooltip label, e.g: , background='red', foreground='blue', etc
-
+            xoffset(int): x - offset (pixels) of tooltip box from mouse pointer
+            yoffset(int): y - offset (pixels) of tooltip box from mouse pointer
         """
+
         self.widget = widget
+        tk.Menu.__init__(self, widget, tearoff=0, bg=bg, fg=fg, activebackground=bg, activeforeground=fg, relief='flat')
+        self.add_command(label=text, hidemargin=True)
+
         self.text = text
         self.waittime = waittime  # milliseconds
         self.xoffset = xoffset
         self.yoffset = yoffset
-        self.kwargs = kwargs
-        self.tipwindow = None
         self.id = None
-        self.label = None
+
         self._id1 = self.widget.bind("<Enter>", self.enter, add='+')
         self._id2 = self.widget.bind("<Leave>", self.leave, add='+')
         self._id3 = self.widget.bind("<ButtonPress>", self.leave, add='+')
 
-        # for dynamic tooltip, use widget.update_tooltip('new text')
+        # for compatibility, to be removed in future
         widget.update_tooltip = self.update_tooltip
-
         widget.tooltip = self
 
     def __del__(self):
-     try:
-        self.widget.unbind("<Enter>", self._id1)
-        self.widget.unbind("<Leave>", self._id2)  
-        self.widget.unbind("<ButtonPress>", self._id3) 
-        self.unschedule()
-        self.hidetip()
-     except tk.TclError:
-         pass
-
-    def update_tooltip(self, text):
-        self.text = text
         try:
-            self.label.config(text=text)
-        except:
+            self.unpost()
+            self.widget.unbind("<Enter>", self._id1)
+            self.widget.unbind("<Leave>", self._id2)
+            self.widget.unbind("<ButtonPress>", self._id3)
+            self.unschedule()
+            self.hidetip()
+        except tk.TclError:
             pass
 
     def enter(self, event=None):
@@ -90,37 +74,23 @@ class ToolTip:
             self.id = None
 
     def showtip(self):
-        if self.tipwindow:
-            return
-        # The tip window must be completely outside the widget;
-        # otherwise when the mouse enters the tip window we get
-        # a leave event and it disappears, and then we get an enter
-        # event and it reappears, and so on forever :-(
-        # x = self.widget.winfo_rootx() + 20
-        # y = self.widget.winfo_rooty() + self.widget.winfo_height() + 1
-
-        # or show it under mouse position with offset
-        x = self.widget.winfo_pointerx() + self.xoffset
-        y = self.widget.winfo_pointery() + self.yoffset
-
-        self.tipwindow = tw = tk.Toplevel(self.widget)
-    
-        # show no border on the top level window
-        tw.wm_overrideredirect(1)
-
-        tw.wm_geometry("+%d+%d" % (x, y))
- 
-        self.label = ttk.Label(self.tipwindow, text=self.text, justify=tk.LEFT, padding=(5, 2),
-                          background="#ffffe0", relief=tk.SOLID, borderwidth=1)
-
-        configure_widget(self.label, **self.kwargs)
-        self.label.pack()
-
+        if not self.winfo_viewable():
+            # tip text should be displayed away from the mouse pointer to prevent triggering leave event
+            x = self.widget.winfo_pointerx() + self.xoffset
+            y = self.widget.winfo_pointery() + self.yoffset
+            self.update_tooltip(self.text)
+            self.post(x, y)
 
     def hidetip(self):
-        if self.tipwindow:
-            self.tipwindow.destroy()
-            self.tipwindow = None
+        if self.winfo_viewable():
+            self.unpost()
+
+    def update_tooltip(self, text):
+        self.text = text
+        try:
+            self.entryconfigure(0, label=text, hidemargin=True)
+        except:
+            pass
 
 
 tooltip = ToolTip
@@ -131,13 +101,27 @@ def main():
     root = tk.Tk()
     b = tk.Button(root, text="Hello", command=root.destroy)
     b.pack()
-    tooltip(b, "Hello world")
+    l = tk.Label(root, text='my label')
+    l.pack()
+    b.tp = tooltip(b, "Hello world")
+    l.tp = tooltip(l, "Hello world")
 
     # we can modify any property thru the widget.tooltip reference
-    # b.tooltip.waittime = 2000
-    # b.tooltip.text= 'new text'
+    b.tp.waittime = 100
+    b.tp.text = 'new text'
+
+    # use dynamic tooltip
+    x = list(range(20))
+
+    def foo():
+        if x:
+            l.tp.update_tooltip(f'counter: {x.pop()}')  # or can use l.tp.text='some text'
+            root.after(1000, foo)
+
+    foo()
 
     root.mainloop()
+
 
 if __name__ == '__main__':
     main()
