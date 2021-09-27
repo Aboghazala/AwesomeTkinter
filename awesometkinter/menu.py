@@ -10,7 +10,8 @@ import tkinter as tk
 
 class RightClickMenu(tk.Menu):
     """Context menu or right click menu popup"""
-    def __init__(self, parent, menu_items, callback=None, bg='white', fg='black', abg='blue', afg='white', 
+
+    def __init__(self, parent, menu_items, callback=None, bg='white', fg='black', abg='blue', afg='white',
                  bind_left_click=False, bind_right_click=True):
         """initialize
         Args:
@@ -51,6 +52,7 @@ class RightClickMenu(tk.Menu):
 
         # prevent random selection if menu shows under mouse 
         self.pressflag = False
+
         def onpress(event):
             self.pressflag = True
 
@@ -71,7 +73,6 @@ class RightClickMenu(tk.Menu):
             parent.bind(f"<Button-{i}>", self.popup, add='+')
             self.bind(f'<{i}>', onpress, add='+')
             self.bind(f'<ButtonRelease-{i}>', onrelease, add='+')
-
 
     def popup(self, event):
         """show right click menu"""
