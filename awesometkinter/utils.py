@@ -460,10 +460,10 @@ def scroll_with_mousewheel(widget, target=None, modifier='Shift', apply_to_child
         def scroll_horizontally(event):
             # scroll horizontally
             if event.num == 4 or event.delta > 0:
-                target_widget.xview_scroll(-1, "unit")
+                target_widget.xview_scroll(-10, "unit")
 
             elif event.num == 5 or event.delta < 0:
-                target_widget.xview_scroll(1, "unit")
+                target_widget.xview_scroll(10, "unit")
 
             return 'break'
 
