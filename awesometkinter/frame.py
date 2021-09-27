@@ -92,10 +92,16 @@ class ScrollableFrame(tk.Frame):
         self.place_forget = self.outer_frame.place_forget
 
         # get scroll methods from canvas
-        self.yview_scroll = self.canvas.yview_scroll
-        self.xview_scroll = self.canvas.xview_scroll
         self.yview_moveto = self.canvas.yview_moveto
         self.xview_moveto = self.canvas.xview_moveto
+
+    def yview_scroll(self, *args):
+        if self.winfo_height() > self.outer_frame.winfo_height():
+            self.canvas.yview_scroll(*args)
+
+    def xview_scroll(self, *args):
+        if self.winfo_width() > self.outer_frame.winfo_width():
+            self.canvas.xview_scroll(*args)
 
     def _on_self_configure(self, event):
         """Reset the scroll region to match contents"""
