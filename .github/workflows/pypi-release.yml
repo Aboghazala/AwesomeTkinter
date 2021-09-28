@@ -1,0 +1,36 @@
+# build and upload pypi release,
+#ref: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+name: upload pypi package
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on "version.py" file changed
+  push:
+    paths:
+      - 'awesometkinter/version.py'
+
+  # Allows manual running for this workflow
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools wheel twine
+          pip install build
+      - name: Build package
+        run: python setup.py sdist bdist_wheel
+      - name: Publish package
+        env:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+        run: python -m twine upload dist/*

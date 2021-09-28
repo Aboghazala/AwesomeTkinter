@@ -1,0 +1,51 @@
+# github action to create new release 
+
+name: draft-relese
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on "version.py" file changed
+  push:
+    paths:
+      - 'awesometkinter/version.py'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: get version name
+        run: |
+          echo "version=$(cat ./awesometkinter/version.py | grep -Po '\d+\.\d+\.\d+')" >> $GITHUB_ENV
+
+      - name: create release body
+        run: |
+          echo '
+
+          **AwesomeTkinter changelog:**
+          '  > ./release-body.txt
+
+          sed 's/\r$//' ./ChangeLog.txt | sed -e '/^$/,$d' >> ./release-body.txt
+
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.version }}
+          release_name: AwesomeTkinter version ${{ env.version }}
+          body_path: ./release-body.txt
+          draft: false
+          prerelease: false
