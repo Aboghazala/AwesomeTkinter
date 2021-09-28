@@ -1,3 +1,9 @@
+2021.9.28:
+- fix scrolling for ScrollableFrame
+- increase scroll step when scroll horizontally (shift + mousewheel)
+- [ScrolledText] change superclass to tk.Text instead of tk.Frame.
+- tooltip auto adjust position to stay inside screen border.
+
 2021.7.25:
 - fix error sometimes raised by entry bidi-handler.
 
