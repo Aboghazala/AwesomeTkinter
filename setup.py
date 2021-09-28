@@ -3,7 +3,7 @@
 """
     AwesomeTkinter, a new tkinter widgets design using custom styles and images
 
-    :copyright: (c) 2020 by Mahmoud Elshahat.
+    :copyright: (c) 2020-2021 by Mahmoud Elshahat.
 
 """
 
