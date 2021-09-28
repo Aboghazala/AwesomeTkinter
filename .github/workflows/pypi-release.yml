@@ -1,7 +1,7 @@
 # build and upload pypi release,
 #ref: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
-name: upload pypi package
+name: pypi
 
 # Controls when the action will run.
 on:

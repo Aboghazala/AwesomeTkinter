@@ -1,6 +1,6 @@
 # github action to create new release 
 
-name: draft-relese
+name: new-relese
 
 # Controls when the action will run.
 on:
