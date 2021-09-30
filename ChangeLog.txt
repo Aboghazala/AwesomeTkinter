@@ -1,3 +1,6 @@
+2021.9.30:
+- [right click menu] fix "button widget" show pressed status on mouse hover
+
 2021.9.28:
 - fix scrolling for ScrollableFrame
 - increase scroll step when scroll horizontally (shift + mousewheel)
