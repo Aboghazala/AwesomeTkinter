@@ -70,13 +70,18 @@ class RightClickMenu(tk.Menu):
             trigger_buttons += [2, 3]
 
         for i in trigger_buttons:
+            if i == 1 and parent.winfo_class() == 'Button':
+                parent['command'] = self.popup
+                continue
             parent.bind(f"<Button-{i}>", self.popup, add='+')
             self.bind(f'<{i}>', onpress, add='+')
             self.bind(f'<ButtonRelease-{i}>', onrelease, add='+')
 
-    def popup(self, event):
+    def popup(self, event=None):
         """show right click menu"""
-        x, y = event.x_root, event.y_root
+        # x, y = event.x_root, event.y_root
+        x = self.parent.winfo_pointerx()
+        y = self.parent.winfo_pointery()
         self.tk_popup(x, y)
 
     def context_menu_handler(self, option):
