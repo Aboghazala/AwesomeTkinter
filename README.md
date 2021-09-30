@@ -1,6 +1,10 @@
 AwesomeTkinter offers some pretty tkinter widgets  
 These widgets are just a tkinter widgets with custom styles and images.
 
+[![Downloads](https://static.pepy.tech/personalized-badge/awesometkinter?period=total&units=international_system&left_color=grey&right_color=blue&left_text=Total%20Downloads%20(pypi))](https://pepy.tech/project/awesometkinter)
+
+Homepage: https://github.com/Aboghazala/AwesomeTkinter
+
 ![progressbar](https://user-images.githubusercontent.com/37757246/93717162-3c059b80-fb74-11ea-9998-00fc5ba82ca3.png)
 
 [More Screenshots](https://github.com/Aboghazala/AwesomeTkinter/issues/1)
@@ -14,13 +18,14 @@ current available widgets:
 - radiobutton with better indicator/check mark quality.
 - simple scrollbar "without arrow heads"
 - tooltip
+- right click menu
 
 new widgets are coming soon
 
 # bidi support on Linux:
 
 Added support to bidi language e.g. Arabic to be shown properly in tkinter widgets (on linux), see example below
-![progressbar](https://user-images.githubusercontent.com/37757246/117579022-63a07880-b0f1-11eb-8295-66942fec4025.png)
+![bidi_screenshot](https://user-images.githubusercontent.com/37757246/117579022-63a07880-b0f1-11eb-8295-66942fec4025.png)
 
 ```
 import tkinter as tk
@@ -85,6 +90,7 @@ this will display a test window
 - minimum python version 3.6
 - tkinter
 - pillow >= 6.0.0
+- python-bidi (for linux)
 
 # Limitations:
 - some widgets don't work well with all tkinter themes, it is recommended to 
