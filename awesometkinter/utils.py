@@ -575,8 +575,43 @@ def theme_compatibility_check(print_warning=False):
     return True
 
 
+def center_window(window, width=None, height=None, set_geometry_wh=True, reference=None):
+    """center a tkinter window on screen's center and set its geometry if width and height given
+
+    Args:
+        window (tk.root or tk.Toplevel): a window to be centered
+        width (int): window's width
+        height (int): window's height
+        set_geometry_wh (bool): include width and height in geometry
+        reference: tk window e.g parent window as a reference
+    """
+
+    # update_idletasks will cause a window to show early at the top left corner
+    # then change position to center in non-proffesional way
+    # window.update_idletasks()
+
+    if width and height:
+        if reference:
+            refx = reference.winfo_x() + reference.winfo_width() // 2
+            refy = reference.winfo_y() + reference.winfo_height() // 2
+        else:
+            refx = window.winfo_screenwidth() // 2
+            refy = window.winfo_screenheight() // 2
+
+        x = refx - width // 2
+        y = refy - height // 2
+
+        if set_geometry_wh:
+            window.geometry(f'{width}x{height}+{x}+{y}')
+        else:
+            window.geometry(f'+{x}+{y}')
+
+    else:
+        window.eval('tk::PlaceWindow . center')
+
+
 __all__ = ['identify_operating_system', 'calc_md5', 'generate_unique_name', 'invert_color', 'rgb2hex',
            'change_img_color', 'resize_img', 'mix_images', 'color_to_rgba', 'is_dark', 'calc_font_color',
            'calc_contrast_color', 'text_to_image', 'create_pil_image', 'create_image', 'create_circle',
            'scroll_with_mousewheel', 'unbind_mousewheel', 'get_widget_attribute', 'ImageTk', 'set_default_theme',
-           'theme_compatibility_check', 'configure_widget']
+           'theme_compatibility_check', 'configure_widget', 'center_window']
