@@ -19,6 +19,8 @@ current available widgets:
 - simple scrollbar "without arrow heads"
 - tooltip
 - right click menu
+- auto wrapping label
+- auto fit label
 
 new widgets are coming soon
 
