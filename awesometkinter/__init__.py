@@ -19,6 +19,7 @@ from .utils import *
 from .config import *
 from .version import __version__
 from .tooltip import tooltip
+from .label import AutofitLabel, AutoWrappingLabel
 
 
 def main():
