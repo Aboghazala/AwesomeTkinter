@@ -12,7 +12,7 @@ from tkinter import ttk
 from .button import Button3d, Radiobutton, Checkbutton
 from .frame import Frame3d, ScrollableFrame
 from .menu import RightClickMenu
-from .progressbar import RadialProgressbar, RadialProgressbar3d
+from .progressbar import RadialProgressbar, RadialProgressbar3d, Segmentbar
 from .scrollbar import SimpleScrollbar
 from .text import ScrolledText
 from .utils import *

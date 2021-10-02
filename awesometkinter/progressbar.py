@@ -7,6 +7,10 @@
 
 import tkinter as tk
 from tkinter import ttk
+
+if not __package__:
+    __package__ = 'awesometkinter'
+
 from .utils import *
 from .images import *
 
@@ -243,4 +247,90 @@ class RadialProgressbar3d(RadialProgressbar):
         kwargs.pop('self')
         kwargs.pop('extra')
 
-        RadialProgressbar.__init__(self, **kwargs) 
+        RadialProgressbar.__init__(self, **kwargs)
+
+
+class Segmentbar(tk.Canvas):
+    def __init__(self, master, bg=None, fg=None, width=100, height=10):
+        self.master = master
+        master_bg = get_widget_attribute(master, 'background')
+        bg = bg or calc_contrast_color(master_bg, 30)
+        self.fg = fg or calc_font_color(bg)
+        self.bars = {}
+        self.height = height
+        self.width = width
+        super().__init__(self.master, bg=bg, width=self.width, height=self.height, bd=0, highlightthickness=0)
+        self.bind('<Configure>', self.redraw)
+
+    def ubdate_bars(self, segments_progress):
+        # segments_progress, e.g [total size, [(starting range, length), ...]]
+        size = segments_progress[0]
+
+        # scale values
+        scale = size / self.width
+        scaled_values = set()  # use set to filter repeated values
+        for item in segments_progress[1]:
+            start, length = item
+            start = start // scale  # ignore fraction, e.g. 3.7 ====> 3.0
+            length = length // scale + (1 if length % scale else 0)  # ceiling, eg: 3.2 ====> 4.0
+            end = start + length
+
+            start = int(start)
+            end = int(end)
+
+            scaled_values.add((start, end))
+
+        for item in scaled_values:
+            self.update_bar(item)
+
+    def update_bar(self, info):
+        """expecting a tuple or a list with the following structure
+        (range-start, length, total-file-size)"""
+        start, end = info
+
+        tag_id = self.bars.get(start, None)
+        if tag_id:
+            x0, y0, x1, y1 = self.coords(tag_id)
+            x1 = end
+            self.coords(tag_id, x0, y0, x1, y1)
+        else:
+            tag_id = self.create_rectangle(start, 0, end, self.height, fill=self.fg, width=0)
+            self.bars[start] = tag_id
+
+        self.update_idletasks()
+
+    def redraw(self, *args):
+        # in case of window get resized by user
+        scale = self.winfo_width() / self.width
+        self.width = self.winfo_width()
+        for tag_id in self.bars.values():
+            x0, y0, x1, y1 = self.coords(tag_id)
+            x0 *= scale
+            x1 *= scale
+            self.coords(tag_id, x0, y0, x1, y1)
+
+        self.update_idletasks()
+
+
+if __name__ == '__main__':
+    root = tk.Tk()
+    sb = Segmentbar(root, bg='grey', fg='black', width=200)
+    sb.pack(fill='x', padx=10, pady=10)
+
+    # segments_progress, e.g [total size, [(starting range, length), ...]]
+    seg1 = [20, 0]
+    seg2 = [100, 0]
+    seg3 = [300, 15]
+
+    def progress():
+        sb.ubdate_bars([400, [seg1, seg2, seg3]])
+        seg1[1] += 1
+        seg2[1] += 1
+        seg3[1] += 1
+
+        if seg1[1] != 101:
+            root.after(100, progress)
+
+    progress()
+
+    root.mainloop()

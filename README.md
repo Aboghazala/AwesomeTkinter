@@ -11,7 +11,8 @@ Homepage: https://github.com/Aboghazala/AwesomeTkinter
 
 current available widgets:
 - radial progressbar (flat or 3d).
-- scrollable frames,
+- segment progressbar.
+- scrollable frames.
 - 3d buttons,
 - 3d frames.
 - Scrollable text widget
