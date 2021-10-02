@@ -23,6 +23,7 @@ current available widgets:
 - auto wrapping label
 - auto fit label
 - alternative filechooser, and folderchooser for linux using zenity or kdialog if installed on target system
+- date picker window
 
 new widgets are coming soon
 

@@ -21,6 +21,7 @@ from .version import __version__
 from .tooltip import tooltip
 from .label import AutofitLabel, AutoWrappingLabel
 from .dialog import filechooser, folderchooser
+from .datepicker import DatePicker
 
 
 def main():
