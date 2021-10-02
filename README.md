@@ -21,6 +21,7 @@ current available widgets:
 - right click menu
 - auto wrapping label
 - auto fit label
+- alternative filechooser, and folderchooser for linux using zenity or kdialog if installed on target system
 
 new widgets are coming soon
 

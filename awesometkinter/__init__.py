@@ -20,6 +20,7 @@ from .config import *
 from .version import __version__
 from .tooltip import tooltip
 from .label import AutofitLabel, AutoWrappingLabel
+from .dialog import filechooser, folderchooser
 
 
 def main():
