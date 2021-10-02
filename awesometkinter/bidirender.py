@@ -13,6 +13,9 @@ import tkinter as tk
 import re
 from bidi.algorithm import get_display
 
+if not __package__:
+    __package__ = 'awesometkinter'
+
 from .menu import RightClickMenu
 
 UNSHAPED = 0
@@ -103,7 +106,8 @@ shapes_table = (
     ('\u06D3', '\uFBB0', '', '', '\uFBB1'),  # (ۓ, ﮰ, , , ﮱ), 
     ('\uFEFB', '\uFEFB', '', '', '\uFEFC'),  # (ﻻ, ﻻ, , , ﻼ), 
     ('\uFEF7', '\uFEF7', '', '', '\uFEF8'),  # (ﻷ, ﻷ, , , ﻸ), 
-    ('\uFEF5', '\uFEF5', '', '', '\uFEF6'),  # (ﻵ, ﻵ, , , ﻶ), 
+    ('\uFEF5', '\uFEF5', '', '', '\uFEF6'),  # (ﻵ, ﻵ, , , ﻶ),
+    ('\uFEF9', '\uFEF9', '', '', '\uFEFA'),  # (ﻹ, ﻹ, , , ﻺ),
 )
 
 mandatory_liga_table = {
@@ -116,6 +120,14 @@ mandatory_liga_table = {
     ('\uFEE0', '\uFE88'): '\uFEFA',  # ['ﻠ', 'ﺈ', 'ﻺ']
     ('\uFEE0', '\uFE8E'): '\uFEFC',  # ['ﻠ', 'ﺎ', 'ﻼ']
     }
+
+# lam = '\u0644'
+lamalif_to_alif = {
+    '\uFEF5': '\u0622',  # [ 'آ', 'ﻵ']
+    '\uFEF7': '\u0623',  # ['ﺃ', 'ﻷ']
+    '\uFEF9': '\u0625',  # [ 'ﺇ', 'ﻹ']
+    '\uFEFB': '\u0627',  # ['ﺍ', 'ﻻ']
+}
 
 HARAKAT_RE = re.compile(
     '['
@@ -256,6 +268,14 @@ def derender_bidi_text(text):
         match = [item[0] for item in shapes_table if c in item]
         if match:
             c = match[0]
+
+        # lam-alif decomposition
+        if c in lamalif_to_alif:
+            alif = lamalif_to_alif[c]
+            lam = '\u0644'
+            unshaped_text.append(alif)
+            c = lam
+
         unshaped_text.append(c)
 
     # reverse text order to its original state
