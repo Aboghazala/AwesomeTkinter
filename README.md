@@ -173,24 +173,24 @@ import tkinter as tk
 import awesometkinter as atk
 
 root = tk.Tk()
-b = tk.Button(root, text="Hello", command=root.destroy)
-b.pack()
-l = tk.Label(root, text='my label')
-l.pack()
-b.tp = tooltip(b, "Hello world")
-l.tp = tooltip(l, "Hello world")
+btn = tk.Button(root, text="Hello", command=root.destroy)
+btn.pack()
+lbl = tk.Label(root, text='my label')
+lbl.pack()
+btn.tp = tooltip(btn, "Hello world")
+lbl.tp = tooltip(lbl, "Hello world")
 
 # we can modify any property thru the widget.tooltip reference
-b.tp.waittime = 100
-b.tp.text = 'new text'
+btn.tp.waittime = 100
+btn.tp.text = 'new text'
 
 # Also we can dynamically change tooltip as follows:
-x = 0
+lbl.counter = 0
+
 def foo():
     # change tooltip every second to mimic progress
-    global x
-    x += 1
-    l.tp.update_tooltip('Progress: ' + str(x) + '%')  # or use l.tp.text='some text'
+    lbl.counter = lbl.counter + 1 if lbl.counter < 100 else 0
+    lbl.tp.update_tooltip('Progress: ' + str(lbl.counter) + '%')  # or use lbl.tp.text='some text'
     root.after(1000, foo)
 
 foo()
