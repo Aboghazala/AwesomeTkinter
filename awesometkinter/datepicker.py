@@ -18,7 +18,8 @@ from .utils import *
 class DatePicker(tk.Toplevel):
     """Date picker window"""
 
-    def __init__(self, master, min_year=None, max_year=None, title='Date Picker', bg=None, fg=None, sbg=None,
+    def __init__(self, master, min_year=None, max_year=None, year=None, month=None, day=None, hour=None, minute=None,
+                 title='Date Picker', bg=None, fg=None, sbg=None,
                  btnbg=None, btnfg=None, width=420, height=180):
         """initialize
 
@@ -26,6 +27,7 @@ class DatePicker(tk.Toplevel):
             parent: parent window
             min_year (int): minimum year to show
             max_year (int): max. year to show
+            year, month, day, hour, minute (int): set selected time
             title (str): window title
         """
         self.master = master
@@ -37,23 +39,27 @@ class DatePicker(tk.Toplevel):
         self.btnfg = btnfg or calc_font_color(self.btnbg)
 
         today = datetime.datetime.today()
-        self.min_year = min_year or today.year - 20
-        self.max_year = max_year or today.year + 20
+        year = year or today.year
+        min_year = min_year or year - 100
+        max_year = max_year or year + 100
+        month = month or today.month
+        day = day or today.day
+        hour = hour or today.hour
+        minute = minute or today.minute
 
         self.selected_date = None
 
-        self.fields = {'Year': {'values': list(range(self.min_year, self.max_year + 1)), 'selection': today.year},
-                       'Month': {'values': list(range(1, 13)), 'selection': today.month},
-                       'Day': {'values': list(range(1, 32)), 'selection': today.day},
-                       'Hour': {'values': list(range(0, 24)), 'selection': today.hour},
-                       'Minute': {'values': list(range(0, 60)), 'selection': today.minute},
+        self.fields = {'Year': {'values': list(range(min_year, max_year + 1)), 'selection': year},
+                       'Month': {'values': list(range(1, 13)), 'selection': month},
+                       'Day': {'values': list(range(1, 32)), 'selection': day},
+                       'Hour': {'values': list(range(0, 24)), 'selection': hour},
+                       'Minute': {'values': list(range(0, 60)), 'selection': minute},
                        }
 
         # initialize super
         tk.Toplevel.__init__(self, self.master)
 
         # bind window close
-        self.protocol("WM_DELETE_WINDOW", self.close)
         center_window(self, width=width, height=height, reference=self.master)
 
         self.title(title)
@@ -152,7 +158,6 @@ class DatePicker(tk.Toplevel):
     def set_selection(self):
         """return selected date"""
         values = [int(item['selection']) for item in self.fields.values()]
-        print(values)
         self.selected_date = datetime.datetime(*values)
         self.close()
 
@@ -161,7 +166,7 @@ if __name__ == '__main__':
     root = tk.Tk()
 
     def foo():
-        dp = DatePicker(root, bg='white', fg='black')
+        dp = DatePicker(root, year=1900, day=23, hour=18, bg='white', fg='black')
         print(dp.selected_date)
 
     tk.Button(root, text='select date', command=foo).pack()
