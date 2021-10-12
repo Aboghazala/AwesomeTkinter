@@ -1,3 +1,13 @@
+2021.10.12:
+- new widgets:
+  * AutoWrappingLabel
+  * AutofitLabel
+  * Segment progressbar
+  * DatePicker
+- alternative filechooser, and folderchooser for linux using zenity or kdialog if installed on target system.
+- add center window function
+- fix tooltip truncated text (on windows), issue #8
+
 2021.10.2:
 - fix de-render bidi text.
 
