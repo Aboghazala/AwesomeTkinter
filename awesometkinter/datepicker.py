@@ -98,12 +98,14 @@ class DatePicker(tk.Toplevel):
             days_in_month = self.days_in_month(year, month)
             day_combo.config(values=list(range(1, days_in_month + 1)))
             if day > days_in_month:
-                day_combo.set(days_in_month)
+                corrected_value = days_in_month
+                day_combo.set(corrected_value)
+                self.fields['Day']['selection'] = corrected_value
 
         # style
         s = ttk.Style()
         custom_style = 'custom.TCombobox'
-        # combobox is consist of a text area, down arrow, and dropdown menu (listbox)
+        # combobox consists of a text area, down arrow, and dropdown menu (listbox)
         # arrow: arrowcolor, background
         # text area: foreground, fieldbackground
         arrow_bg = sbg
@@ -150,6 +152,7 @@ class DatePicker(tk.Toplevel):
     def set_selection(self):
         """return selected date"""
         values = [int(item['selection']) for item in self.fields.values()]
+        print(values)
         self.selected_date = datetime.datetime(*values)
         self.close()
 
