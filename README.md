@@ -27,9 +27,13 @@ current available widgets:
 
 new widgets are coming soon
 
-# bidi support on Linux:
+# bidi support:
 
-Added support to bidi language e.g. Arabic to be shown properly in tkinter widgets (on linux), see example below
+tkinter has no bidi support for RTL languages <br>
+Linux: Arabic words shown reversed and not joined <br>
+Windows: bidi support is provided by Windows bidi Engine, but it is not efficient enough, espicially when writing arabic into "Entry" widget <br>
+
+This Library help solving these problems in Linux and windows, see example below <br>
 ![bidi_screenshot](https://user-images.githubusercontent.com/37757246/117579022-63a07880-b0f1-11eb-8295-66942fec4025.png)
 
 ```
