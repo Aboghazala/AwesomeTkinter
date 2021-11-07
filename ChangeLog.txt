@@ -1,3 +1,6 @@
+2021.11.8:
+- fix for arabic letter "hamza" on windows, issue #9
+
 2021.10.12:
 - new widgets:
   * AutoWrappingLabel
