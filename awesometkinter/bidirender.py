@@ -4,11 +4,13 @@
     :copyright: (c) 2020-2021 by Mahmoud Elshahat.
 
     module description:
-        handle arabic text to be shown properly in tkinter widgets (on linux)
+        handle arabic text to be shown properly in tkinter widgets
+        it works on linux, and windows.
 
 """
 
 import os
+import platform
 import tkinter as tk
 import re
 from bidi.algorithm import get_display
@@ -24,6 +26,7 @@ INITIAL = 2
 MEDIAL = 3
 FINAL = 4
 
+operating_system = platform.system()  # current operating system  ('Windows', 'Linux', 'Darwin')
 
 shapes_table = (
     ('\u0621', '\uFE80', '', '', ''),  # (ء, ﺀ, , , ), 
@@ -52,7 +55,7 @@ shapes_table = (
     ('\u0638', '\uFEC5', '\uFEC7', '\uFEC8', '\uFEC6'),  # (ظ, ﻅ, ﻇ, ﻈ, ﻆ), 
     ('\u0639', '\uFEC9', '\uFECB', '\uFECC', '\uFECA'),  # (ع, ﻉ, ﻋ, ﻌ, ﻊ), 
     ('\u063A', '\uFECD', '\uFECF', '\uFED0', '\uFECE'),  # (غ, ﻍ, ﻏ, ﻐ, ﻎ), 
-    ('\u0640', '\u0640', '\u0640', '\u0640', '\u0640'),  # (ـ, ـ, ـ, ـ, ـ), 
+    ('\u0640', '\u0640', '\u0640', '\u0640', '\u0640'),  # (ـ, ـ, ـ, ـ, ـ),  Arabic Tatweel
     ('\u0641', '\uFED1', '\uFED3', '\uFED4', '\uFED2'),  # (ف, ﻑ, ﻓ, ﻔ, ﻒ), 
     ('\u0642', '\uFED5', '\uFED7', '\uFED8', '\uFED6'),  # (ق, ﻕ, ﻗ, ﻘ, ﻖ), 
     ('\u0643', '\uFED9', '\uFEDB', '\uFEDC', '\uFEDA'),  # (ك, ﻙ, ﻛ, ﻜ, ﻚ), 
@@ -62,7 +65,7 @@ shapes_table = (
     ('\u0647', '\uFEE9', '\uFEEB', '\uFEEC', '\uFEEA'),  # (ه, ﻩ, ﻫ, ﻬ, ﻪ), 
     ('\u0648', '\uFEED', '', '', '\uFEEE'),  # (و, ﻭ, , , ﻮ), 
     # ('\u0649', '\uFEEF', '\uFBE8', '\uFBE9', '\uFEF0'),  # (ى, ﻯ, ﯨ, ﯩ, ﻰ), 
-    ('\u0649', '\uFEEF', '', '', '\uFEF0'),   # (ى, ﻯ, , , ﻰ), 
+    ('\u0649', '\uFEEF', '', '', '\uFEF0'),  # (ى, ﻯ, , , ﻰ),
     ('\u064A', '\uFEF1', '\uFEF3', '\uFEF4', '\uFEF2'),  # (ي, ﻱ, ﻳ, ﻴ, ﻲ), 
     ('\u0671', '\uFB50', '', '', '\uFB51'),  # (ٱ, ﭐ, , , ﭑ), 
     ('\u0677', '\uFBDD', '', '', ''),  # (ٷ, ﯝ, , , ), 
@@ -110,6 +113,8 @@ shapes_table = (
     ('\uFEF9', '\uFEF9', '', '', '\uFEFA'),  # (ﻹ, ﻹ, , , ﻺ),
 )
 
+unshaped_to_isolated = {x[UNSHAPED]: x[ISOLATED] for x in shapes_table}
+
 mandatory_liga_table = {
     ('\uFEDF', '\uFE82'): '\uFEF5',  # ['ﻟ', 'ﺂ', 'ﻵ']
     ('\uFEDF', '\uFE84'): '\uFEF7',  # ['ﻟ', 'ﺄ', 'ﻷ']
@@ -119,7 +124,7 @@ mandatory_liga_table = {
     ('\uFEE0', '\uFE84'): '\uFEF8',  # ['ﻠ', 'ﺄ', 'ﻸ']
     ('\uFEE0', '\uFE88'): '\uFEFA',  # ['ﻠ', 'ﺈ', 'ﻺ']
     ('\uFEE0', '\uFE8E'): '\uFEFC',  # ['ﻠ', 'ﺎ', 'ﻼ']
-    }
+}
 
 # lam = '\u0644'
 lamalif_to_alif = {
@@ -143,7 +148,7 @@ HARAKAT_RE = re.compile(
     ']',
 
     re.UNICODE | re.X
-    )
+)
 
 ARABIC_RE = re.compile(
     '['
@@ -157,7 +162,7 @@ ARABIC_RE = re.compile(
     '\uFE70-\uFEFC'
     ']',
     re.UNICODE | re.X
-    )
+)
 
 NUMBERS_RE = re.compile(
     '['
@@ -169,9 +174,9 @@ NUMBERS_RE = re.compile(
 
 NEUTRAL_RE = re.compile(
     '['
-    '\u0000-\u0040'  
-    '\u005B-\u0060'  
-    '\u007B-\u007F'  
+    '\u0000-\u0040'
+    '\u005B-\u0060'
+    '\u007B-\u007F'
     ']',
 
     re.UNICODE | re.X)
@@ -202,11 +207,11 @@ def do_shaping(text):
         # get all different letter shapes 
         if c is None:
             return {}
-        key = c 
+        key = c
         match = [v for v in shapes_table if key in v]
         if match:
-            match = match[0]
-            return {ISOLATED: match[1], INITIAL: match[2], MEDIAL: match[3], FINAL: match[4]}
+            match = match[UNSHAPED]
+            return {ISOLATED: match[ISOLATED], INITIAL: match[INITIAL], MEDIAL: match[MEDIAL], FINAL: match[FINAL]}
         else:
             return {}
 
@@ -233,7 +238,6 @@ def do_shaping(text):
 
             c = c_shapes.get(position) or c_shapes.get(alternative[position])
 
-          
         return c
 
     t = []
@@ -245,17 +249,38 @@ def do_shaping(text):
     return ''.join(t)
 
 
+def workaround_for_windows_auto_bidi(text):
+    """workaround to disable windows auto-bidi
+    we should pass only ISOLATED form of arabic letters
+    since unshaped letters trigger windows bidi engine
+        
+    """
+    # todo: should find away to disable windows bidi completely
+
+    # convert all unshaped letters to isolated to bypass windows auto-bidi 
+    text = ''.join([unshaped_to_isolated.get(c, c) for c in text])
+
+    # remove arabic TATWEEL letter '\u0640', it has no isolated form
+    text = text.replace('\u0640', '')
+
+    return text
+
+
 def reshaper(text):
     text = do_shaping(text)
     text = do_ligation(text)
     text = remove_harakat(text)
+
+    if operating_system == 'Windows':
+        text = workaround_for_windows_auto_bidi(text)
+
     return text
 
 
 def render_bidi_text(text):
     text = get_display(text)
     text = reshaper(text)
-    
+
     return text
 
 
@@ -303,7 +328,7 @@ def split_path(path):
         if parts[0] == path:  # sentinel for absolute paths
             allparts.insert(0, parts[0])
             break
-        elif parts[1] == path: # sentinel for relative paths
+        elif parts[1] == path:  # sentinel for relative paths
             allparts.insert(0, parts[1])
             break
         else:
@@ -388,9 +413,7 @@ def handle_entry(event, widget):
         new_index = current_index - 1 if current_index >= 1 else 0
         widget.icursor(new_index)
 
-
     c = event.char
-    text = widget._get()
     index = widget.index('insert')
 
     if not (c or event.keysym in ('BackSpace', 'Delete') or isarabic(c) or is_neutral(c)):
@@ -417,11 +440,9 @@ def handle_entry(event, widget):
     else:
         widget.RTL = False
 
-
     if widget.last_text == widget._get():
         return
 
-   
     text = widget._get()
     index = widget.index('insert')
     widget.delete(0, "end")
@@ -481,7 +502,6 @@ def add_bidi_support(widget, render_copy_paste=True, copy_paste_menu=False, ispa
 
 
 def override_copy_paste(widget, copyrender=derender_text, pasterender=render_text, ispath=False, copy_paste_menu=False):
-    
     def copy(value):
         """copy clipboard value
 
@@ -549,15 +569,15 @@ def override_copy_paste(widget, copyrender=derender_text, pasterender=render_tex
 
 if __name__ == '__main__':
     root = tk.Tk()
-    text = 'السلام عليكم'
+    txt = 'السلام عليكم'
 
     # text display incorrectly on linux
     dummyvar = tk.StringVar()
-    dummyvar.set(text)
+    dummyvar.set(txt)
     tk.Label(root, textvariable=dummyvar, font='any 20').pack()
 
     # uncomment below to set a rendered text to first label
-    dummyvar.set(render_bidi_text(text))
+    dummyvar.set(render_bidi_text(txt))
 
     entry = tk.Entry(root, font='any 20', justify='right')
     entry.pack()
@@ -570,7 +590,7 @@ if __name__ == '__main__':
     add_bidi_support(entry)
 
     # we can use set() and get() methods to set and get text on a widget
-    entry.set(text)
+    entry.set(txt)
     lbl.set('هذا كتاب adventure شيق')
 
     root.mainloop()
